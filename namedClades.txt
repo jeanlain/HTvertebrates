@@ -1,0 +1,28 @@
+node	name	latin	onTree	onPlot	xOffset	yOffset	col
+611	Lampreys	Agnatha	TRUE	TRUE	0	595	#D0C4D6
+309	Jawed vertebrates	Gnathostomata	FALSE	FALSE	0.5	0	NA
+310	Chondrichthyes	Chondrichthyes	TRUE	TRUE	0	70	#FFBF80
+311	Osteichthyes	Osteichthyes	FALSE	FALSE	0.5	0	NA
+312	Ray-finned fishes	Actinopterygii	TRUE	TRUE	0.5	40	#C5D9E3
+374	Sarcopterygii	Sarcopterygii	FALSE	FALSE	0.5	0	NA
+67	Coelacanth	Actinistia	TRUE	TRUE	0	428	#B1856D
+375	Tetrapods	Tetrapoda	TRUE	FALSE	0.5	0	NA
+313	Teleosts	Teleostei	TRUE	FALSE	0.5	0	NA
+376	Amphibians	Amphibia	TRUE	TRUE	-1	50	#FBCBCA
+380	Amniotes	Amniota	FALSE	FALSE	0.5	0	NA
+381	Sauropsida	Sauropsida	FALSE	FALSE	0.5	0	NA
+477	Mammals	Mammalia	TRUE	TRUE	0.5	0	#6A96B4
+474	Turtles	Chelonia	TRUE	TRUE	-1	185	#E37E80
+382	Squamates	Squamata	TRUE	TRUE	-5	70	#6AA066
+389	Archosauromorpha	Archosauromorpha	FALSE	FALSE	0.5	0	NA
+390	Archosauria	Archosauria	FALSE	FALSE	0.5	0	NA
+472	Crocodiles	Crocodilia	TRUE	TRUE	0.5	30	#FDDEB6
+391	Birds	Aves	TRUE	TRUE	0.5	0	#C9DFB5
+482	Eutherians	Eutheria	FALSE	FALSE	0.5	0	NA
+479	Marsupials	Metatheria	TRUE	FALSE	0.5	0	NA
+488	Ferungulates	Ferungulata	TRUE	FALSE	0.5	5	NA
+546	Glires	Glires	TRUE	FALSE	0.5	10	NA
+580	Primates	Primates	TRUE	FALSE	-2	20	NA
+392	Paleognaths	Palaeognathae	FALSE	FALSE	0.5	0	NA
+533	Bats	Chiroptera	TRUE	FALSE	0.5	30	NA
+305	Platypus	Monotremata	TRUE	FALSE	0.5	173	NA
