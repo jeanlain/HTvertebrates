@@ -16,7 +16,7 @@ The other R scripts whose names do not start with numbers are either:
 - sourced from the numbered scripts: HTvFunctions.R and circularPlots.R contain functions required for the other scripts
 - or launched via Rscript (for long, CPU-intensive tasks), from the numbered scripts.
 
-Other files are used by the scripts (in addition to supplementary dataset 4 provided in with the paper, but not in this folder)
+Other files are used by the scripts (in addition to supplementary dataset 4 provided in with the paper, but not in this folder do to file size limitations)
 - 307.species.info.txt gives general information about the genomes and is used to download genomes sequences from ncbi
 - ftp_links.txt is also used to download genomes sequences from ncbi
 - timetree.nwk is the timetree (newick format) used through the analysis
