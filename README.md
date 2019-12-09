@@ -11,12 +11,12 @@ These scripts come with no warranty. They are not a ready-to-use piece of softwa
 # Requirements
 The scripts require R 3.4+ with packages stringi, data.table, Biostrings, matrixStats, ape, igraph, seqinr and RColorBrewer.
 The following programs are also required: 
-RepeatModeler 1.0.10
-RepeatMasker 4.0.7
-BUSCO 3.0.1
-ncbi blast+ 2.6.0
-diamond 0.9.19
-seqtk 1.2-r94 
+- RepeatModeler 1.0.10
+- RepeatMasker 4.0.7
+- BUSCO 3.0.1
+- ncbi blast+ 2.6.0
+- diamond 0.9.19
+- seqtk 1.2-r94 
 
 
 # Installation
