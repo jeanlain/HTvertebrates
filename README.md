@@ -23,7 +23,7 @@ The following programs are also required:
 Dowload all the files of this repository in the same directory.
 
 # Usage
-Run R scripts starting with numbers are run in the order corresponding to their numbers, always from the installation directory, which should be set as the working directory.
+Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
 It is strongly recommended to run these scripts in interactive mode (from an R session), as adapting this pipeline to other datasets should require some modifications. 
 
 # File description
