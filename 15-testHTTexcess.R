@@ -2,7 +2,7 @@
 ##############################permutates species to test whether some clades have more htt than expected by chance. This can be run at any point after step 12.
 source('HTvFunctions.R')
 tree = read.tree("timetree.nwk")
-retainedHits = fread("gunzip -c data4-retained_hits.txt.gz")		#data file provided with the paper, which is a table of hits representing HTT
+retainedHits = fread("supplementary-data4-retained_hits")		#data file provided with the paper, which is a table of hits representing HTT
 
 
 #sbatch --mail-type=BEGIN,END,FAIL --cpus-per-task=20 --mem=20G --wrap="Rscript randomSpeciesPairs.R 20"		#performs the permutations on 20 CPUs
@@ -76,7 +76,7 @@ dev.off()
 
 #for ray-finned fishes, we record results for each super family (table S1)
 rayFin = stats[taxon == 312L,.(mean_over_simulations = round(sum(simulated),2), max_over_simulations = sum(maxNumber), observed = sum(observed)), by = testSplit(superfamily, ".", 1)]
-writeT(rayFin, "permutationsClade312PerSuperF.txt")
+writeT(rayFin, "tableS1.txt")
 
 
 ############### investigating if more transfers between "fishes" and tetrapods involved aquatic tetrapods

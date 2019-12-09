@@ -65,8 +65,9 @@ ageBreaks = hitGroupStats[,seq(min(age),max(age), length.out = 20)]				#we will 
 httHits[,age :=  nodeDepth(tree, mrca)]											#the divergence time of the species involved in each hit 
 httHits[,ageClass := .bincode(age, ageBreaks, include.lowest = T)]				#assigns this time to the classes of divergence times
 perAge = httHits[ka/ks <3, .(kaks = weighted.mean(ka/ks, length.aa), age = mean(age)), by = .(DNA = grepl("DNA", superF), ageClass)]		#obtains mean ka/ks per divergence time calss and TE class (DNA or RNA)
-p = perAge[DNA ==T, plot(age, kaks, ylim = c(0, max(kaks)), xlab = "Time since divergence (My)", ylab = "Ka/Ks")]		#makes the plot for DNA transposons (there was no obvious trends for class I TEs) = figure S1 of the paper
-abline(v = 120, col ="red")
 
+pdf("figureS1.pdf")		#makes the plot for DNA transposons (there was no obvious trends for class I TEs) = figure S1 of the paper
+p = perAge[DNA ==T, plot(age, kaks, ylim = c(0, max(kaks)), xlab = "Time since divergence (My)", ylab = "Ka/Ks")]		abline(v = 120, col ="red")
+dev.off()
 hitGroupStats[,keep := nQ >=5L & nS >=5L & nq >= 2L & ns >=2L & (nMode > nLast +20L | maxkS < qKs - 0.2) & age > 120]	#based on the above, we retain hit groups involving at least 5 copies in each clade (to account for possible contamination), including 2 copies per clade in the retained hits, and whose kS is low enough and involving lineages thare are quite divergent
 writeT(hitGroupStats, "TEs/clustering/hitGroupStats.txt")

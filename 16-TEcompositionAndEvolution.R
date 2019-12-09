@@ -1,8 +1,8 @@
 
-# shows TE composition in species and hit HTT event (figure 4) and analyses the Ka/Ks ratios of TEs. This can be run at any point after step 13
+# shows TE composition in species, hit groups, and HTT events (figure 4) and analyses the Ka/Ks ratios of TEs. This can be run at any point after step 13
 
 source('HTvFunctions.R')
-retainedHits = fread("gunzip -c data4-retained_hits.txt.gz")		#data file provided with the paper, which is a table of hits representing HTT
+retainedHits = fread("supplementary-data4-retained_hits.txt")		#data file provided with the paper, which is a table of hits representing HTT
 
 # collecting stats on TE composition in species, to build the barplots (figure 4)
 
@@ -12,7 +12,7 @@ compo[,c("superfamily", "subClass") := corres[chmatch(superF, superFam), .(newNa
 compo[,class := ifelse(subClass == "DNA","DNA","RNA")]
 TEcompo = compo[ ,.(number_of_copies_300bp = sum(nCopies), total_nucleotides = sum(bp), number_of_families = sum(nFam)), by = .(species = sp, RepeatModeler_superfamily = superF)]
 TEcompo = TEcompo[number_of_copies_300bp >0L]
-writeT(TEcompo,"data3-TEcomposition_per_species.txt")		#supplementary dataset associated with the paper
+writeT(TEcompo,"supplementary-data3-TEcomposition_per_species.txt")		#supplementary dataset associated with the paper
 
 perSuperF = compo[,.(nCopies = sum(nCopies), nFam = sum(nFam), bp = sum(as.numeric(bp))), by = .(superfamily, subClass, class)]	#summing counts per super family
 
@@ -67,4 +67,4 @@ dev.off()
 perHitGroup = allKaKs[independent == T & ks  > 0,.(kaks = weighted.mean(ka/ks, length), ks = weighted.mean(ks, length)), by = .(superfamily, hitgroup, htt)]#obtains one value per independent hit group (or community), as ka/ks rates within a tree are not independant. Note that we only use independent transfers (+ all communities, since we set independent = T for these)
 res = perHitGroup[,.(.N, kaks = mean(kaks), ks = mean(ks), U = wilcox.test(kaks, mu = 1, alternative = "less")$statistic, p = wilcox.test(kaks, mu = 1, alternative = "less")$p.value), by = .(superfamily, htt)]
 res = res[order(htt, chmatch(superfamily, forBarplots$superfamily), decreasing = T)]
-writeT(res, "kaks.txt")			#used for table S2 of the supp text.
+writeT(res, "tableS2.txt")			#used for table S2 of the supp text.

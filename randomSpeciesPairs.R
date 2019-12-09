@@ -3,7 +3,7 @@ source("HTvFunctions.R")
 
 #we shuffle species to generate random species pairs involved in transfers, for each super family. However, we may not generate "illegal pairs" for which no HTT can be infered, due to our requirement that species must be divergent by 2*120 My.
 tree = read.tree("timetree.nwk")			#so we need to import the timetree
-retainedHits = fread("gunzip -c data4-retained_hits.txt.gz")
+retainedHits = fread("supplementary-data4-retained_hits.txt")
 
 args = commandArgs(trailingOnly=TRUE)	
 nCPUs = as.integer(args[1])										#number of CPUs to use

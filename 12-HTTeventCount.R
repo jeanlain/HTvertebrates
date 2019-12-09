@@ -13,7 +13,7 @@ hitGroupPairs=fread("TEs/clustering/networks/all.hitGroupPairSharedCopies.txt")	
 
 #First, we assess whether hitGroup2 involves species related to those of hitGroup1. We assess if a clade of hitGroup1 is the same as, nested in, or encompassing, a clade of hitGroup2. Note that this doesn't require that species are shared. "clade 1" is always the clade on the left of table, (hence containing the "query" copies) in the hit group hits
 tree = read.tree("timetree.nwk")
-clades = httHits[, .(node1 = MRCA(tree, unique(sp1)), node2 = MRCA(tree, unique(sp2))), by = hitGroup]		#the pairs of clades involved each hit group (transfer), encoded as node numbers in the species tree
+clades = httHits[, .(node1 = MRCA(tree, unique(sp1)), node2 = MRCA(tree, unique(sp2))), by = hitGroup]		#the pairs of clades involved in each hit group (transfer), encoded as node numbers in the species tree
 mrcas = httHits[match(1:max(hitGroup), hitGroup), mrca] #this vector will make the correspondance between a hit group (its index) and an mrca (its value) 
 node1 = clades[match(1:max(hitGroup), hitGroup), node1] ; node2 = clades[match(1:max(hitGroup), hitGroup), node2]		#same principle as above for the 2 clades composing the hit groups. Doing this speeds up the command below as this avoid performing a match on the huge hitGroupPairs table
 
@@ -135,5 +135,5 @@ corres = fread("superF.txt", header = F, col.names = c("superFam","subClass","ne
 httHits[,superFName := corres[chmatch(superF, superFam), newName]]			#adds common super family names to the hits
 retainedHits = httHits[keep == T, -c("keep","mrca","superF")]				#removes hits and columns we don't keep
 setnames(retainedHits,c("query","subject","f1","f2","com","superFName"), c("copy1","copy2","consensus1","consensus2","community","superfamily"))		#replace column names with more user-friendly ones
-writeT(retainedHits, "data4-retained_hits.txt")								#the list of HTT hits associated with the paper (supplementary dataset). This one only includes retained hit groups
+writeT(retainedHits, "supplementary-data4-retained_hits.txt")								#the list of HTT hits associated with the paper (supplementary dataset). This one only includes retained hit groups
 

@@ -15,7 +15,7 @@ blastx = fread(blastxFile)
 covPerCopy = blastx[,sum(end-start+1L), by = copy]															#selects HSPs for which there is enough protein regions per copy
 TEhits[,hit := 1:.N]																						#to keep track of hits, we assign them an integer identifier in a column
 hits = TEhits[, which(query %chin% covPerCopy[V1>30L, copy] & subject %chin% covPerCopy[V1>30L, copy])]		#hits are simply row indices of TEhits table
-nJobs = round(length(hits) / 25000)								#nb of jobs to run. The size of a batch must not be too big as this may cause segfaut issues with the pairwise alignments).
+nJobs = round(length(hits) / 2500)								#nb of jobs to run. The size of a batch must not be too big as this may cause segfaut issues with the pairwise alignments).
 hits = splitEqual(sample(hits), n = nJobs)																	#splits the hits in batches for parallel computations. Note that we randomize hits (rows) to reduce differences in job durations (the longer hits are on top of the TEhits table)
 
 seqs = readDNAStringSet(seqFasta)												

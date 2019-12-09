@@ -90,9 +90,11 @@ writeT(Ks, "Ks200AAnoRedundancy.txt")
 timeRanges = seq(0, sqrt(max(Ks$divTime, na.rm=T)+1), length.out = 20 )^2					#generates divergence time classes within which we compute average Ks (all species pairs considered). We use sqrt() to have shorter intervals for low divergence times (using quantile() to generate breaks yields too many points at low divergence times, so the plot looks biased)
 Ks[,range := .bincode(divTime, timeRanges)]			#assigns divergence times to the classes
 KsDistrib = Ks[Ks < 9 & !is.na(divTime),.(time = mean(divTime), Ks = weighted.mean(Ks, w = alnLength)), by = range]		#ignoring Ks values ≥ 9 (oversaturated) 
+
+pdf("figure S1.pdf")
 p = KsDistrib[, plot(time, Ks, ylim = c(0, 3), xlab = "Divergence time (My)", ylab = "Ks", pch = 16, col = "darkgrey")]
 fit = nls(Ks~ max*a*time/(max+a*time), data = KsDistrib, start = list(a = 0.01, max = 3))	#fits a curve assuming initial linear correlation between Ks and divergence time (coeff a) and saturation at Ks = max (as used for insects)
 x = KsDistrib[, seq(0, max(time),length.out = 150)]											#to add a smooth curve corresponding to the model, we generate 150 divergence time values (x axis)
 lines(x, predict(fit, list(time = x)))																								
-
+dev.off()
 

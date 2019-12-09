@@ -2,7 +2,7 @@
 
 source('HTvFunctions.R')
 tree = read.tree("timetree.nwk")
-retainedHits = fread("gunzip -c data4-retained_hits.txt.gz")		#data file provided with the paper, which is a table of hits representing HTT
+retainedHits = fread("supplementary-data4-retained_hits")		#data file provided with the paper, which is a table of hits representing HTT
 
 setorder(retainedHits, -pID)																		#places hits whith highest pID on top
 connections = retainedHits[!duplicated(hitgroup), .(sp1,sp2, superfamily, hitgroup, independent)]	#so we can create a table of the best hit per transfer, the one we will show on the tree
