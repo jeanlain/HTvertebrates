@@ -43,7 +43,7 @@ The following files are required by the scripts:
 - namedClades.txt is a table of major vertebrate clades in this tree, with their names and color codes used to make some of the paper's figures (these figures are generated with the scripts).
 - superF.txt makes the correspondance between repeatModeler family codes (first column), TE class (2nd column) and more common TE superfamily names (3rd column). It is used in steps 15 and 16.
  
-## Ouput
+## Output
 The final output correspond to results of the publication (please see the publication for their description).
 - Figure2.pdf, Figure3.pdf and Figure4.pdf are produced at steps 14, 15 and 16 respectively. They correspond to figures of the main text
 - figureS1.pdf is generated at step 5. It corresponds to the supplementary figure 1.
