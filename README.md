@@ -17,10 +17,11 @@ these scripts come with no warranty. They are not a ready-to-use piece of softwa
 - [ncbi blast+](https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) 2.6.0
 - [diamond](https://github.com/bbuchfink/diamond) 0.9.19
 - [seqtk](https://github.com/lh3/seqtk) 1.2-r94 
+- [Slurm Workload Manager](https://slurm.schedmd.com/download.html) 17.11.7
 
 The pipeline was not tested with other versions of the above programs. 
 
-Hardware requirements: a linux server with ≥200 CPUs, ≥0.5 TB of system memory,  ≥2 TB of free hard drive space and working internet connection (fiber is recommended). On this hardware, the pipeline should take  ~4 weeks to complete.
+Hardware requirements: a linux cluster with ≥200 CPUs, ≥0.5 TB of system memory,  ≥2 TB of free hard drive space and working internet connection (fiber is recommended). On this hardware, the pipeline should take  ~4 weeks to complete.
 
 ## Installation
 Download all the files of this repository into the same directory.
