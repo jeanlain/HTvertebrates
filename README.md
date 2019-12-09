@@ -18,10 +18,10 @@ The following programs are also required:
 - diamond 0.9.19
 - seqtk 1.2-r94 
 
-Hardware requirement to perform the analysis in a reasonable amount of time are a linux server with ≥200 CPUs, ≥0.5 TB of system memory and ≥2 TB of free hard drive space. 
+Hardware requirements: a linux server with ≥200 CPUs, ≥0.5 TB of system memory and ≥2 TB of free hard drive space. On this hardware, the pipeline should take  ~4 weeks to complete.
 
 # Installation
-Dowload all the files of this repository in the same directory.
+Download all the files of this repository into the same directory.
 
 # Usage
 Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
