@@ -1,5 +1,16 @@
 
-# shows TE composition in species, hit groups, and HTT events (figure 4) and analyses the Ka/Ks ratios of TEs. This can be run at any point after step 13
+
+##%######################################################%##
+#                                                          #
+####          This stage makes figures showing          ####
+####       TE composition in species, hit groups,       ####
+####           and HTT events (figure 4), and           ####
+####         analyses the Ka/Ks ratios of TEs.          ####
+#                                                          #
+##%######################################################%##
+
+
+#This can be run at any point after step 13
 
 source('HTvFunctions.R')
 retainedHits = fread("supplementary-data4-retained_hits.txt")		#data file provided with the paper, which is a table of hits representing HTT
@@ -7,64 +18,158 @@ retainedHits = fread("supplementary-data4-retained_hits.txt")		#data file provid
 # collecting stats on TE composition in species, to build the barplots (figure 4)
 
 compo = fread("all.TEcomposition.txt")		#number of copies of at least 300 bp for the different genomes and super families, generated in step 2
-corres = fread("superF.txt", header = F, col.names = c("superFam","subClass","newName"))		#correspondance between repeat modeler super families and more common super family names
-compo[,c("superfamily", "subClass") := corres[chmatch(superF, superFam), .(newName, subClass)]]
-compo[,class := ifelse(subClass == "DNA","DNA","RNA")]
-TEcompo = compo[ ,.(number_of_copies_300bp = sum(nCopies), total_nucleotides = sum(bp), number_of_families = sum(nFam)), by = .(species = sp, RepeatModeler_superfamily = superF)]
-TEcompo = TEcompo[number_of_copies_300bp >0L]
-writeT(TEcompo,"supplementary-data3-TEcomposition_per_species.txt")		#supplementary dataset associated with the paper
+corres = fread(
+  "superF.txt",
+  header = F,
+  col.names = c("superFam", "subClass", "newName")
+)		#correspondance between repeat modeler super families and more common super family names
+compo[, c("superfamily", "subClass") := corres[chmatch(superF, superFam), .(newName, subClass)]]
+compo[, class := ifelse(subClass == "DNA", "DNA", "RNA")]
+TEcompo = compo[, .(
+  number_of_copies_300bp = sum(nCopies),
+  total_nucleotides = sum(bp),
+  number_of_families = sum(nFam)
+), by = .(species = sp, RepeatModeler_superfamily = superF)]
+TEcompo = TEcompo[number_of_copies_300bp > 0L]
+writeT(TEcompo,
+       "supplementary-data3-TEcomposition_per_species.txt")		#supplementary dataset associated with the paper
 
-perSuperF = compo[,.(nCopies = sum(nCopies), nFam = sum(nFam), bp = sum(as.numeric(bp))), by = .(superfamily, subClass, class)]	#summing counts per super family
+perSuperF = compo[, .(
+  nCopies = sum(nCopies),
+  nFam = sum(nFam),
+  bp = sum(as.numeric(bp))
+), by = .(superfamily, subClass, class)]	#summing counts per super family
 
-HTTperSuperF = retainedHits[,.(nTr = length(unique(hitgroup[independent])), nHitGroup = length(unique(hitgroup))), by = superfamily]		#counts of HTT events and hit groups per superfamily
+HTTperSuperF = retainedHits[, .(nTr = length(unique(hitgroup[independent])), nHitGroup = length(unique(hitgroup))), by = superfamily]		#counts of HTT events and hit groups per superfamily
 perSuperF = merge(perSuperF, HTTperSuperF, by = "superfamily", all = F)		#this merge removes super families not involved in HTT since we don't set all = T
 
 lower = 10L				#number of independent transfer below which we pool super families within TE classes
-smallFam = perSuperF[nTr < lower, .(nCopies =sum(nCopies, na.rm =T), nFam =sum(nFam), bp = sum(bp), nTr=sum(nTr), nHitGroup = sum(nHitGroup)), by = class]		#sums numbers from these pooled superfamilies in a new table
-forBarplots = rbind(data.table(superfamily=paste("Other", smallFam$class), subClass = smallFam$class, smallFam), perSuperF[nTr >= lower])		#this table has the small super families pooled per class
-forBarplots = forBarplots[order(-class, !grepl("Other", superfamily), subClass, nTr)]		#sorting by subclass then number of independent tansfers, for plotting
-palDNA = c(grey(0.5), brewer.pal(8,"Paired")[c(4, 2)])					#barplot sectors of DNA transposons have darker colors
-palRNA = c(grey(0.7), brewer.pal(forBarplots[,sum(class=="RNA") -1L],"Pastel1"))
-forBarplots[,col := c(palRNA, palDNA)]
+smallFam = perSuperF[nTr < lower, .(
+  nCopies = sum(nCopies, na.rm = T),
+  nFam = sum(nFam),
+  bp = sum(bp),
+  nTr = sum(nTr),
+  nHitGroup = sum(nHitGroup)
+), by = class]		#sums numbers from these pooled superfamilies in a new table
+forBarplots = rbind(data.table(
+  superfamily = paste("Other", smallFam$class),
+  subClass = smallFam$class,
+  smallFam
+),
+perSuperF[nTr >= lower])		#this table has the small super families pooled per class
+forBarplots = forBarplots[order(-class,!grepl("Other", superfamily), subClass, nTr)]		#sorting by subclass then number of independent tansfers, for plotting
+palDNA = c(grey(0.5), brewer.pal(8, "Paired")[c(4, 2)])					#barplot sectors of DNA transposons have darker colors
+palRNA = c(grey(0.7), brewer.pal(forBarplots[, sum(class == "RNA") - 1L], "Pastel1"))
+forBarplots[, col := c(palRNA, palDNA)]
 
 ##################### processing Ka/Ks of TEs, to show on the same figure as the barplots
 kaks = fread("gunzip -c TEs/TEevolution/TEKaKsWithinGenomes.txt.gz")	# importing from ka ks value between TEs witin communities generated by step 13-TEKaKsWinthinGenomes.R. Ka Ks resulting from HTT are already in the retainedHits table
-kaks[,superfamily := corres[chmatch(superF, superFam), newName]]		#replacing repeatmodeler superfamily names with common names
+kaks[, superfamily := corres[chmatch(superF, superFam), newName]]		#replacing repeatmodeler superfamily names with common names
 
-allKaKs = rbind(retainedHits[, .(ka=Ka, ks=Ks, length = length.aa, superfamily,hitgroup, independent, htt = T)], kaks[com %in% retainedHits$community,.(ka, ks, length, superfamily, hitgroup = com, independent = T, htt = F)])		#rbinding ka ks rates for pairs of copies involved in HTT and within communities in a single table (which will be convenient). We have to use the same column names, so a "community" becomes a hit group and the htt column will indicate whether the copies diverged by HTT
-allKaKs[, class := corres[chmatch(superfamily, newName), ifelse(subClass=="DNA","DNA","RNA")]]				#retreives TE class (ignoring the retrotransposon subclasses)
+allKaKs = rbind(retainedHits[, .(
+  ka = Ka,
+  ks = Ks,
+  length = length.aa,
+  superfamily,
+  hitgroup,
+  independent,
+  htt = T
+)], kaks[com %in% retainedHits$community, .(
+  ka,
+  ks,
+  length,
+  superfamily,
+  hitgroup = com,
+  independent = T,
+  htt = F
+)])		#rbinding ka ks rates for pairs of copies involved in HTT and within communities in a single table (which will be convenient). 
+#We have to use the same column names, so a "community" becomes a hit group and the htt column will indicate whether the copies diverged by HTT
+allKaKs[, class := corres[chmatch(superfamily, newName), ifelse(subClass ==
+                                                                  "DNA", "DNA", "RNA")]]				#retreives TE class (ignoring the retrotransposon subclasses)
 allKaKs[superfamily %chin% perSuperF[nTr < lower, superfamily], superfamily := stri_c("Other ", class)]		#combining super families involved in less than 10 independent transfers
 
-dens = function(x, w) {			#returns xy coordinates to drawn density curves (of Ka/Ks) that all reach the same height in the Y axis. The difference in Y coordinates between super families on the plot will be 1 unit, so the max height is set to 0.45 (since there are 2 mirrored curves per super family). w represents the weights (which will be the alignment lengths)
-	d = density(x, weights = w/sum(w), na.rm = T)
-	data.table(x = d$x, y = rescale(d$y, c(0,0.45)))			
+dens = function(x, w) {
+  #returns xy coordinates to drawn density curves (of Ka/Ks) that all reach the same height in the Y axis. 
+  #The difference in Y coordinates between super families on the plot will be 1 unit, so the max height is set to 0.45 (since there are 2 mirrored curves per super family). w represents the weights (which will be the alignment lengths)
+  d = density(x, weights = w / sum(w), na.rm = T)
+  data.table(x = d$x, y = rescale(d$y, c(0, 0.45)))
 }
 
-#the x and y coordinates of the density curves (polygons) are placed in a single large data table (one row per vertex). For these curves, we use individual ka/ks rates (not averages per hit group)
-densities = allKaKs[ks > 0L & ka/ks < 5, dens(ka/ks, length), by = .(superfamily, htt, class) ]	#we will clip the plot at ka/ks = 2.5, so we can afford to discard Ka/Ks rates > 5
+#the x and y coordinates of the density curves (polygons) are placed in a single
+#large data table (one row per vertex). For these curves, we use individual
+#ka/ks rates (not averages per hit group)
+densities = allKaKs[ks > 0L &
+                      ka / ks < 5, dens(ka / ks, length), by = .(superfamily, htt, class)]	#we will clip the plot at ka/ks = 2.5, so we can afford to discard Ka/Ks rates > 5
 densities = densities[order(chmatch(superfamily, forBarplots$superfamily), htt)]			#orders the curves to match the future barplots
-densities[,Yoffset := toInteger(superfamily)]									#will be the Y position of each super family on the densiy plots (+1 unit per super family)
-densities[,col := forBarplots[chmatch(densities$superfamily, superfamily), col]]			#the color of ka/ks curves, to match that of barplots. Colors get replicated for each vertex, but we can afford that
+densities[, Yoffset := toInteger(superfamily)]									#will be the Y position of each super family on the densiy plots (+1 unit per super family)
+densities[, col := forBarplots[chmatch(densities$superfamily, superfamily), col]]			#the color of ka/ks curves, to match that of barplots. Colors get replicated for each vertex, but we can afford that
 densities[htt == F, y := -y]													#the curves showing rate of TEs not involved in htt will be drawn negatively
 
 pdf("figure4.pdf", width = 7, height = 4.5)		#figure 4 of the paper
-par(lwd = 0.25, bty ="n", mfrow=c(1,4), las = 1, mai = c(0.6, 0.5, 0.2, 0.2))
-layout(matrix(rep(1:4, each = 2), nrow = 2), widths=c(1,1,1.3, 3))
+par(
+  lwd = 0.25,
+  bty = "n",
+  mfrow = c(1, 4),
+  las = 1,
+  mai = c(0.6, 0.5, 0.2, 0.2)
+)
+layout(matrix(rep(1:4, each = 2), nrow = 2), widths = c(1, 1, 1.3, 3))
 
 border = "grey"
-forBarplots[,barplot(cbind(nCopies/10^6), names.arg = "Copies (millions)", xlim = 0:1 , col = col, border = border)]
-forBarplots[,barplot(cbind(nHitGroup), names.arg = "Hit groups", xlim = 0:1 , col = col, border = border)]
-forBarplots[,barplot(cbind(nTr), names.arg = "Transfers", xlim = 0:1, width = 0.6, col = col, border = border)]
+forBarplots[, barplot(
+  cbind(nCopies / 10 ^ 6),
+  names.arg = "Copies (millions)",
+  xlim = 0:1 ,
+  col = col,
+  border = border
+)]
+forBarplots[, barplot(
+  cbind(nHitGroup),
+  names.arg = "Hit groups",
+  xlim = 0:1 ,
+  col = col,
+  border = border
+)]
+forBarplots[, barplot(
+  cbind(nTr),
+  names.arg = "Transfers",
+  xlim = 0:1,
+  width = 0.6,
+  col = col,
+  border = border
+)]
 
 # plotting Ka/Ks density polygons
-plot(x = c(0, 2.5), y= c(0.5, max(densities$Yoffset + 0.5)), type ="n", yaxt = "n", ylab = "", xlab = "Ka/Ks", bty ="n")		#the empty plot on which polygons will be drawn
+plot(
+  x = c(0, 2.5),
+  y = c(0.5, max(densities$Yoffset + 0.5)),
+  type = "n",
+  yaxt = "n",
+  ylab = "",
+  xlab = "Ka/Ks",
+  bty = "n"
+)		#the empty plot on which polygons will be drawn
 abline(v = 1, lwd = 0.25, col = "grey")								#vertical line at ka/ks = 1
-p = densities[,polygon(x, Yoffset+y, col = col[1], border = border, lwd = 0.25), by = .(superfamily, htt)]
+p = densities[, polygon(x,
+                        Yoffset + y,
+                        col = col[1],
+                        border = border,
+                        lwd = 0.25), by = .(superfamily, htt)]
 p = densities[!duplicated(superfamily), axis(2, at = Yoffset, labels = superfamily, las = 1)]			#adds left axis of super family names
 dev.off()
 
 ###############################tests if Ka/Ks rates in HTT hits are generally lower than 1 within super families
-perHitGroup = allKaKs[independent == T & ks  > 0,.(kaks = weighted.mean(ka/ks, length), ks = weighted.mean(ks, length)), by = .(superfamily, hitgroup, htt)]#obtains one value per independent hit group (or community), as ka/ks rates within a tree are not independant. Note that we only use independent transfers (+ all communities, since we set independent = T for these)
-res = perHitGroup[,.(.N, kaks = mean(kaks), ks = mean(ks), U = wilcox.test(kaks, mu = 1, alternative = "less")$statistic, p = wilcox.test(kaks, mu = 1, alternative = "less")$p.value), by = .(superfamily, htt)]
-res = res[order(htt, chmatch(superfamily, forBarplots$superfamily), decreasing = T)]
+perHitGroup = allKaKs[independent == T &
+                        ks  > 0, .(kaks = weighted.mean(ka / ks, length), ks = weighted.mean(ks, length)), by = .(superfamily, hitgroup, htt)]#obtains one value per independent hit group (or community), as ka/ks rates within a tree are not independant.
+#Note that we only use independent transfers (+ all communities, since we set independent = T for these)
+res = perHitGroup[, .(
+  .N,
+  kaks = mean(kaks),
+  ks = mean(ks),
+  U = wilcox.test(kaks, mu = 1, alternative = "less")$statistic,
+  p = wilcox.test(kaks, mu = 1, alternative = "less")$p.value
+), by = .(superfamily, htt)]
+res = res[order(htt,
+                chmatch(superfamily, forBarplots$superfamily),
+                decreasing = T)]
 writeT(res, "tableS2.txt")			#used for table S2 of the supp text.

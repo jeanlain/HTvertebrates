@@ -1,6 +1,13 @@
 
 
-############### extracts TE copies from genomes using repeatMasker gffs
+
+##%######################################################%##
+#                                                          #
+####         this stages extracts TE copies from        ####
+####          genomes using repeatMasker gffs           ####
+#                                                          #
+##%######################################################%##
+
 ### repeat modeler and repeat masker jobs were not automated in scripts (I didn't do this part)
 ### example of repeatModeler job launched from bash, for one genome (it is assumed that the working directory is specific to one species, and contains the species name in its path):
 # RepeatModeler-open-1.0.10/BuildDatabase -engine ncbi -name mydb genome.fna		#where genome.fna is a species genome (I believe it wouldn't worked on a gzipped fasta)
@@ -22,19 +29,31 @@ dir.create("TEs/TEcomposition", recursive = T)
 dir.create("TEs/copies")
 
 source("HTvFunctions.R")
-gff = list.files(pattern = ".gff$", full.names = T, recursive = T)				#the gff files from repeat masker, listing TE copy coordinates
+gff = list.files(pattern = ".gff$",
+                 full.names = T,
+                 recursive = T)				#the gff files from repeat masker, listing TE copy coordinates
 gffs = data.table(gff, sp = extractSpeciesNames(gff))							#extracts the species names from file paths and puts results in a table
-cons = list.files(pattern = "families.fa$", full.names = T, recursive = T)		#does the same for repeat modeler consensus sequence files
-conss = data.table(cons, sp = extractSpeciesNames(cons))					
-genome = list.files("genomes", pattern = "fna.gz$", full.names = T, recursive = T)		#and for the genome sequence files
-genomes = data.table(genome, sp = extractSpeciesNames(genome))			
-m = merge(gffs, conss, by = "sp", all.x = T); m = merge(m, genomes, by = "sp")		#we put all these file names in a table (merged by species)
-m[,out := stri_c("TEs/copies/", sp, ".TEs.fasta.gz")]			#names of future output files (compressed fastas of TE copies for each species)
-m = m[!file.exists(out)]										#in case the script needs to be relaunched, avoids redoing some work
+cons = list.files(pattern = "families.fa$",
+                  full.names = T,
+                  recursive = T)		#does the same for repeat modeler consensus sequence files
+conss = data.table(cons, sp = extractSpeciesNames(cons))
+genome = list.files(
+  "genomes",
+  pattern = "fna.gz$",
+  full.names = T,
+  recursive = T
+)		                                #and for the genome sequence files
+genomes = data.table(genome, sp = extractSpeciesNames(genome))
+m = merge(gffs, conss, by = "sp", all.x = T)
+m = merge(m, genomes, by = "sp")		            #we put all these file names in a table (merged by species)
+m[, out := stri_c("TEs/copies/", sp, ".TEs.fasta.gz")]			#names of future output files (compressed fastas of TE copies for each species)
+m = m[!file.exists(out)]										  #in case the script needs to be relaunched, avoids redoing some work
 sizes = file.size(m$genome)
-m = m[order(sizes, decreasing = T)]				#we will process bigger genomes first, not make better use of the CPUs
+m = m[order(sizes, decreasing = T)]				    #we will process bigger genomes first, not make better use of the CPUs
 
-fileList = split(m, 1:nrow(m))						#splits the table of file names by row, to send to the function below in parallel (I recall we don't call mcMap on the table because Map() apparently has issues returning tables)
+fileList = split(m, 1:nrow(m))						  #splits the table of file names by row, to send to the function below in parallel (I recall we don't call mcMap on the table because Map() apparently has issues returning tables)
 
-TEcomposition = mclapply(fileList, function(files) do.call(extractCopies, files), mc.cores = 20, mc.preschedule = F)			#see extractCopies() function in HTvFunctions.R for details. 
-writeT(rbindlist(TEcomposition), "TEs/TEcomposition/all.TEcomposition.txt")
+TEcomposition = mclapply(fileList, function(files)
+  do.call(extractCopies, files), mc.cores = 20, mc.preschedule = F)			#see extractCopies() function in HTvFunctions.R for details.
+writeT(data = rbindlist(TEcomposition),
+       path = "TEs/TEcomposition/all.TEcomposition.txt")
