@@ -3,31 +3,33 @@
 © Jean Peccoud, 2019
 
 Scripts used in "Horizontal transfer and evolution of transposable elements in vertebrates" by Hua-Hao Zhang, Jean Peccoud, Min-Rui-Xuan Xu, Xiao-Gu Zhang, Clément Gilbert (submitted).
-These scripts perform the bulk of the analyses.
+These scripts perform the bulk of the analyses. Please, see the publication for details.
 
-Disclamer: these scripts come with no warranty. They are not a ready-to-use piece of software that could apply the pipeline to any dataset, as assumptions are made regarding the naming of certain files and about the computer hardware used for the analyses (which varied depending on the task performed, due to various constraints). Also, some early parts of the pipeline are not automated and were run "manually" on each species.
+## Disclamer
+these scripts come with no warranty. They are not a ready-to-use piece of software that could apply the pipeline to any dataset, as assumptions are made regarding the naming of certain files and about the computer hardware used for the analyses (which varied depending on the task performed, due to various constraints). Also, some early parts of the pipeline are not automated and were run "manually" on each species.
 
 
-# Requirements
-The scripts require R 3.4+ with packages stringi, data.table, Biostrings, matrixStats, ape, igraph, seqinr and RColorBrewer.
-The following programs are also required: 
-- RepeatModeler 1.0.10
-- RepeatMasker 4.0.7
-- BUSCO 3.0.1
-- ncbi blast+ 2.6.0
-- diamond 0.9.19
-- seqtk 1.2-r94 
+## Requirements
+- [R](https://cran.r-project.org) 3.4+ 
+- [RepeatModeler](http://www.repeatmasker.org/RepeatModeler/) 1.0.10
+- [RepeatMasker](http://www.repeatmasker.org/RMDownload.html) 4.0.7
+- [BUSCO](https://gitlab.com/ezlab/busco) 3.0.1
+- [ncbi blast+](https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) 2.6.0
+- [diamond](https://github.com/bbuchfink/diamond) 0.9.19
+- [seqtk](https://github.com/lh3/seqtk) 1.2-r94 
 
-Hardware requirements: a linux server with ≥200 CPUs, ≥0.5 TB of system memory and ≥2 TB of free hard drive space. On this hardware, the pipeline should take  ~4 weeks to complete.
+The pipeline was not tested with other versions of the above programs. 
 
-# Installation
+Hardware requirements: a linux server with ≥200 CPUs, ≥0.5 TB of system memory,  ≥2 TB of free hard drive space and working internet connection (fiber is recommended). On this hardware, the pipeline should take  ~4 weeks to complete.
+
+## Installation
 Download all the files of this repository into the same directory.
 
-# Usage
+## Usage
 Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
 It is strongly recommended to run these scripts in interactive mode (from an R session), as adapting this pipeline to other datasets should require some modifications. 
 
-# File description
+## File description
 The R scripts whose names start with numbers perform successive stages of the analysis. The purpose of each script is described by comments at the beginning of the script. 
 
 - HTvFunctions.R and circularPlots.R contain functions required for the other scripts and are sourced automatically.
@@ -40,7 +42,7 @@ The following files are required by the scripts:
 - namedClades.txt is a table of major vertebrate clades in this tree, with their names and color codes used to make some of the paper's figures (these figures are generated with the scripts).
 - superF.txt makes the correspondance between repeatModeler family codes (first column), TE class (2nd column) and more common TE superfamily names (3rd column). It is used in steps 15 and 16.
  
-# Ouput
+## Ouput
 The final output correspond to results of the publication (please see the publication for their description).
 - Figure2.pdf, Figure3.pdf and Figure4.pdf are produced at steps 14, 15 and 16 respectively. They correspond to figures of the main text
 - figureS1.pdf is generated at step 5. It corresponds to the supplementary figure 1.
