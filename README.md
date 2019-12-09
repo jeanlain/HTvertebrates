@@ -18,6 +18,7 @@ The following programs are also required:
 - diamond 0.9.19
 - seqtk 1.2-r94 
 
+Hardware requirement to perform the analysis in a reasonable amount of time are a linux server with ≥200 CPUs, ≥0.5 TB of system memory and ≥2 TB of free hard drive space. 
 
 # Installation
 Dowload all the files of this repository in the same directory.
