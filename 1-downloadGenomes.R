@@ -2,7 +2,7 @@
 
 ##%######################################################%##
 #                                                          #
-####           downloading genomes from ncbi            ####
+##  This stage downloads the species's genomes from ncbi   #
 #                                                          #
 ##%######################################################%##
 ####### it's probably better to run this script via: Rscript 1-downloadGenomes.R
