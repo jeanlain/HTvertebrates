@@ -17,7 +17,7 @@ For those who may want to use the pipeline, see below:
 
 The pipeline was not tested with other versions of the above programs. 
 
-Hardware requirements: a linux cluster with ≥200 CPUs, ≥0.5 TB of system memory,  ≥2 TB of free hard drive space and working internet connection (fiber is recommended). On this hardware, the pipeline should take  ~4 weeks to complete.
+Hardware requirements: a linux cluster with ≥200 CPUs, ≥0.5 TB of system memory,  ≥2 TB of free hard drive space and working internet connection (fiber is recommended). On this hardware, the pipeline should take 1-2 months to complete.
 
 ## Installation
 Download all the files of this repository into the same directory.
