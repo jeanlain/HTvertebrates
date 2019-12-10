@@ -1,11 +1,9 @@
 # HTvertebrates
 
 Scripts used in "Horizontal transfer and evolution of transposable elements in vertebrates" by Hua-Hao Zhang, Jean Peccoud, Min-Rui-Xuan Xu, Xiao-Gu Zhang, Clément Gilbert (submitted).
-These scripts perform the bulk of the analyses. Please, see the publication for details.
 
-## Disclaimer
-these scripts come with no warranty. They are not a ready-to-use piece of software that could apply the pipeline to any dataset, as assumptions are made regarding the naming of certain files and about the computer hardware used for the analyses (which varied depending on the task performed, due to various constraints). Also, some early parts of the pipeline are not automated and were run "manually" on each species.
-
+These scripts are publicly available to indicate how parts of the analysis were automated. There is no garanty regarding their use. 
+For those who may want to use the pipeline, see below:
 
 ## Requirements
 - [R](https://cran.r-project.org) 3.4+ 
@@ -26,17 +24,17 @@ Download all the files of this repository into the same directory.
 
 ## Usage
 Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
-It is strongly recommended to run these scripts in interactive mode (from an R session), as adapting this pipeline to other datasets should require some modifications. 
+Adapting this pipeline to other datasets and automating all procedures require modifications to the code. Some parts of the analysis were not automated.
 
 ## File description
-The R scripts whose names start with numbers perform successive stages of the analysis. The purpose of each script is described by comments at the beginning of the script. 
+The R scripts whose names start with numbers performed successive stages of the analysis. The purpose of each script is described by comments at the beginning of the script. 
 
 - HTvFunctions.R and circularPlots.R contain functions required for the other scripts and are sourced automatically.
 - The remaining scripts are launched via Rscript (for long, CPU-intensive tasks), from the scripts whose names start with numbers.
 
 The following files are required by the scripts:
 - 307.species.info.txt gives general information about the genomes and is used to download genomes sequences from ncbi
-- ftp_links.txt is also used to download genomes sequences from ncbi
+- ftp_links.txt contains URL to the genome sequences
 - timetree.nwk is the timetree (newick format) used through the analysis
 - namedClades.txt is a table of major vertebrate clades in this tree, with their names and color codes used to make some of the paper's figures (these figures are generated with the scripts).
 - superF.txt makes the correspondance between repeatModeler family codes (first column), TE class (2nd column) and more common TE superfamily names (3rd column). It is used in steps 15 and 16.
@@ -50,5 +48,3 @@ The final output corresponds to results of the publication (please see the publi
 - tableS2.txt is generated at step 16. It corresponds to the supplementary table 2.
 - supplementary-data3-TEcomposition_per_species.txt is generated at step 16. 
 - supplementary-data4-retained_hits.txt is generated step 12. 
-
-
