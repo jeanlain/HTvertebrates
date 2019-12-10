@@ -5,7 +5,7 @@
 Scripts used in "Horizontal transfer and evolution of transposable elements in vertebrates" by Hua-Hao Zhang, Jean Peccoud, Min-Rui-Xuan Xu, Xiao-Gu Zhang, Clément Gilbert (submitted).
 These scripts perform the bulk of the analyses. Please, see the publication for details.
 
-## Disclamer
+## Disclaimer
 these scripts come with no warranty. They are not a ready-to-use piece of software that could apply the pipeline to any dataset, as assumptions are made regarding the naming of certain files and about the computer hardware used for the analyses (which varied depending on the task performed, due to various constraints). Also, some early parts of the pipeline are not automated and were run "manually" on each species.
 
 
@@ -44,7 +44,7 @@ The following files are required by the scripts:
 - superF.txt makes the correspondance between repeatModeler family codes (first column), TE class (2nd column) and more common TE superfamily names (3rd column). It is used in steps 15 and 16.
  
 ## Output
-The final output correspond to results of the publication (please see the publication for their description).
+The final output corresponds to results of the publication (please see the publication for their description).
 - Figure2.pdf, Figure3.pdf and Figure4.pdf are produced at steps 14, 15 and 16 respectively. They correspond to figures of the main text
 - figureS1.pdf is generated at step 5. It corresponds to the supplementary figure 1.
 - figureS2.pdf is generated at step 11. It corresponds to the supplementary figure 2.
