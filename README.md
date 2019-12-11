@@ -24,7 +24,7 @@ Download all the files of this repository into the same directory.
 
 ## Usage
 Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
-Adapting this pipeline to other datasets and automating all procedures require modifications to the code. Some parts of the analysis were not automated.
+Adapting this pipeline to other datasets, hardware configuration, and automating all procedures require modifications to the code. Some parts of the analysis were not automated.
 
 ## File description
 The R scripts whose names start with numbers performed successive stages of the analysis. The purpose of each script is described by comments at the beginning of the script. 
