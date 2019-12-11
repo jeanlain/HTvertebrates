@@ -29,7 +29,8 @@ Adapting this pipeline to other datasets and automating all procedures require m
 ## File description
 The R scripts whose names start with numbers performed successive stages of the analysis. The purpose of each script is described by comments at the beginning of the script. 
 
-- HTvFunctions.R and circularPlots.R contain functions required for the other scripts and are sourced automatically.
+- HTvFunctions.R contains functions required for the other scripts and is sourced automatically.
+- circularPlots.R contains functions used to draw figure 2. 
 - The remaining scripts are launched via Rscript (for long, CPU-intensive tasks), from the scripts whose names start with numbers.
 
 The following files are required by the scripts:
