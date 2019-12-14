@@ -34,12 +34,13 @@ The R scripts whose names start with numbers performed successive stages of the 
 - The remaining scripts are launched via Rscript (for long, CPU-intensive tasks), from the scripts whose names start with numbers.
 
 The following files are required by the scripts:
-- 307.species.info.txt gives general information about the genomes and is used to download genomes sequences from ncbi
+- supplementary-data1-genomes_and_accessions.txt gives general information about the genomes and is used to download genomes sequences from ncbi
 - ftp_links.txt contains URL to the genome sequences
 - timetree.nwk is the timetree (newick format) used through the analysis
 - namedClades.txt is a table of major vertebrate clades in this tree, with their names and color codes used to make some of the paper's figures (these figures are generated with the scripts).
 - superF.txt makes the correspondance between repeatModeler family codes (first column), TE class (2nd column) and more common TE superfamily names (3rd column). It is used in steps 15 and 16.
- 
+- supplementary-data3-TEcomposition_per_species.txt is generatd by the scripts and is provided with the paper, but we also provide it here if to facilitate the reproduction of the results.
+
 ## Output
 The final output corresponds to results of the publication (please see the publication for their description).
 - Figure2.pdf, Figure3.pdf and Figure4.pdf are produced at steps 14, 15 and 16 respectively. They correspond to figures of the main text
@@ -47,5 +48,5 @@ The final output corresponds to results of the publication (please see the publi
 - figureS2.pdf is generated at step 11. It corresponds to the supplementary figure 2.
 - tableS1.txt is generated at step 15. It corresponds to the supplementary table 1.
 - tableS2.txt is generated at step 16. It corresponds to the supplementary table 2.
-- supplementary-data3-TEcomposition_per_species.txt is generated at step 16. 
+- supplementary-data3-TEcomposition_per_species.txt is generated at step 2. 
 - supplementary-data4-retained_hits.txt is generated step 12. 
