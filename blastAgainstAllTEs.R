@@ -1,4 +1,4 @@
-##%######################################################%##
+## %######################################################%##
 #                                                          #
 ####            this script blasts TE copies            ####
 ####           in retained hit groups againts           ####
@@ -9,58 +9,97 @@
 ####            to test whether apparent HTT            ####
 ####       may in fact result from contamination        ####
 #                                                          #
-##%######################################################%##
+## %######################################################%##
 
+# this script is launched at step 11-hitGroupEvaluation.R
+
+# the script reads fastas of copy sequences generated at step 11
+# and uses the blast databases of TE copies generated at step 4-blastTEs.R
+# the output is a blastn tabular output (hits)
 
 source("HTvFunctions.R")
-args = commandArgs(trailingOnly = TRUE)
-nCPUs = as.integer(args[1])
 
-fasFiles = list.files("TEs/clustering/testConta",
-                      pattern = ".fas",
-                      full.names = T)		#query file names
-sp = extractSpeciesNames(basename(fasFiles))
+# the only user input is the number of CPUs to use
+args <- commandArgs(trailingOnly = TRUE)
+nCPUs <- as.integer(args[1])
 
-dbs = list.files("TEs/blastn/db", pattern = ".nin", full.names = T)			#blast databases of TEs for all species, generated in step 4-blastTEs.R
-dbs = gsub(".nin", "", dbs)
-sp2 = TEs / clustering / testConta / blastn / (basename(dbs))
-dbs = dbs[match(sp, sp2)]													#we order db files to match query files
-dir.create("TEs/clustering/testConta/blastn/done", recursive = T)
-outFiles = stri_c("TEs/clustering/testConta/blastn/",
-                  sp,
-                  ".selectedCopies.blastn.out")		#blastn output files
-doneFiles = stri_c("TEs/clustering/testConta/blastn/done/",
-                   sp,
-                   ".selectedCopies.blastn.out")	#same, but after a blast search is done
+# we list the file names of queries to blast
+fasFiles <- list.files(
+    path = "TEs/clustering/testConta",
+    pattern = ".fas",
+    full.names = T
+)
 
-f = !file.exists(doneFiles)				#so we can avoid redoing completed blast searches
+# we extact species names from file names
+sp <- extractSpeciesNames(basename(fasFiles))
 
-blastAgainstTEs = function(fasFile, db, out, done) {
-  system(
-    paste(
-      "blastn -query",
-      fasFile,
-      "-db",
-      db,
-      "-outfmt 6 -max_target_seqs 20 -max_hsps 1 -out",
-      out
-    )
-  )
-  file.rename(out, done)				#moves result to other folder once finished
-  NULL
+# we also list blastn databases (only .nin files) of TEs for all species,
+# these are generated in step 4-blastTEs.R
+dbs <- list.files(
+    path = "TEs/blastn/db",
+    pattern = ".nin",
+    full.names = T
+)
+
+# we remove the extension name from the file
+dbs <- gsub(
+    pattern = ".nin",
+    replacement = "",
+    x = dbs
+)
+
+# extact species names from database names
+dbSp <- extractSpeciesNames(dbs)
+
+# so that we can order db files to match query files
+dbs <- dbs[match(sp, dbSp)]
+
+dir.create("TEs/clustering/testConta/blastn/done", recursive = T) # were output files will go
+
+# names of fiture ouput files during the work
+outFiles <- stri_c(
+    "TEs/clustering/testConta/blastn/",
+    sp,
+    ".selectedCopies.blastn.out"
+)
+
+# and of final output files
+doneFiles <- stri_c(
+    "TEs/clustering/testConta/blastn/done/",
+    sp,
+    ".selectedCopies.blastn.out"
+)
+
+f <- !file.exists(doneFiles) # this is to avoid redoing completed blast searches
+
+# the function that blasts TEs
+blastAgainstTEs <- function(fasFile, db, out, done) {
+    system(paste(
+        "blastn -query",
+        fasFile,
+        "-db",
+        db,
+        "-outfmt 6 -max_target_seqs 20 -max_hsps 1 -out",
+        out
+    ))
+
+    # moves result to other folder once finished
+    file.rename(out, done)
+    NULL
 }
 
-m = mcMap(
-  blastAgainstTEs,
-  fasFiles[f],
-  dbs[f],
-  outFiles[f],
-  doneFiles[f],
-  mc.cores = nCPUs,
-  mc.preschedule = F
+# we apply the blast in parallel
+m <- mcMap(
+    f = blastAgainstTEs,
+    fasFile = fasFiles[f],
+    db = dbs[f],
+    out = outFiles[f],
+    done = doneFiles[f],
+    mc.cores = nCPUs,
+    mc.preschedule = F
 )
-system(
-  "cat TEs/clustering/testConta/blastn/done/*.out > TEs/clustering/testConta/blastn/all.out"
-)
+
+# we concatenate the output
+system("cat TEs/clustering/testConta/blastn/done/*.out > TEs/clustering/testConta/blastn/all.out")
 
 print("finished")
