@@ -1,13 +1,11 @@
-## %##############################################################%##
 #                                                                  #
-#### This script computes pairwise Ka/Ks  between homologous TEs  ##
-#                                                                  #
-## %##############################################################%##
+#### This script computes pairwise Ka/Ks and overal molecular distance between homologous TEs  ##
+
 
 # this script is run at step 7 and at step 13
 
 source("HTvFunctions.R")
-library(seqinr)
+require(seqinr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -57,7 +55,7 @@ hits <- TEhits[, which(
 
 # we split the work into several batches (jobs) for parallelisation
 # The size of a batch of HSPs (4000) must not be too big due to memory constrains.
-nJobs <- round(length(hits) / 4000)
+nJobs <- max(nCPUs, ceiling(length(hits) / 4000))
 
 # we split the HSPs into the batches
 hits <- splitEqual(sample(hits), n = nJobs)

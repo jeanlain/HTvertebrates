@@ -8,6 +8,7 @@
 # This can be run at any point after step 12
 
 source("HTvFunctions.R")
+require(RColorBrewer)
 
 # this script uses:
 # - the data file provided with the paper: a table of hits representing HTT

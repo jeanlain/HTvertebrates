@@ -7,15 +7,30 @@
 
 # some of the functions are used only once in the analysis, but they were not written specifically for it
 
+
+# We also use this script to check and install the required packages
+packages <- c("parallel", "stringi", "data.table", "matrixStats", "ape", "iGrpah", "seqinr", "RColorBrewer")
+missing <- setdiff(packages, rownames(installed.packages()))
+
+# if the commands below do not work, packages should be installed manually
+if(length(missing) >0) install.packages(missing)  
+
+if (! "Biostrings" %in% rownames(installed.packages())) {
+  
+  if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+  }
+  
+  BiocManager::install("Biostrings")
+}
+
+
+# we load the packages we need for the functions below
+l = lapply(setdiff(packages, c("iGraph","seqinr")), require, character.only = TRUE)
+
 options("stringsAsFactors" = F)
 options("scipen" = 20)
-require(stringi)
-require(data.table)
-require(Biostrings)
-require(matrixStats)
-require(parallel)
-require(ape)
-require(RColorBrewer)
+
 
 
 
@@ -102,24 +117,18 @@ toInteger <- function(string,
 }
 
 
-equalClasses <- function(x, n) {
-    # used by splitEqual()
-    f <- .bincode(x, quantile(x, seq(0, 1, length.out = n + 1), na.rm = T), include.lowest = T)
-    f
-}
 
-
-splitEqual <- function(x, f = NA, n, ...) {
+splitEqual <- function(x, n, ...) {
     # splits an object (x, a vector or a table) into n classes of equal sizes, returns a list
-    
+  
     l <- length(x)
     if (is.data.frame(x)) {
         l <- nrow(x)
     }
-    if (all(is.na(f))) {
-        f <- cut(1:l, n)
+    if (n == 1L) {
+      f <- rep(1L, l)
     } else {
-        f <- equalClasses(f, n)
+      f <- cut(1:l, n)
     }
     split(x, f, ...)
 }
@@ -210,11 +219,14 @@ assignToRegion <- function(bed, pos, olv = T) {
     
     # creates a data table with start and ends in the same "boundary" column.
     # "+1" gives a bit or headroom (probably not needed).
+    # These will be the intervals for binning. We use "id" to keep track of 
+    # the rows (regions id) of the original bed
+    
     dt <- data.table(
         boundary = c(starts, starts + bed[, end - start + 1L]),
+        id=rep(bed$id,2)
     )
     
-    # These will be the intervals for binning. We use "id" to keep track of the rows (regions id) of the original bed
     setorder(dt, boundary)
 
     # "region" will be the region (id) covering an interval (only for the start of this interval).

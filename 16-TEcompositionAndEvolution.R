@@ -13,6 +13,7 @@
 # This can be run at any point after step 13
 
 source("HTvFunctions.R")
+require(RColorBrewer)
 
 # data file provided with the paper, which is a table of hits representing HTT
 retainedHits <- fread("supplementary-data4-retained_hits.txt")
@@ -358,7 +359,7 @@ for (i in 1:3) {
   # we retrieve the name of the variable to plot horizontally
   variable = names(xNames)[i]  
   
-  pdf(stri_c("supplementary_figure", i + 4, ".pdf"), width = 8.5, height = 11)
+  pdf(stri_c("figure_s", i + 4, ".pdf"), width = 8.5, height = 11)
   par(mfrow = c(3, 2))
   
   # we make a plot for each TE subclass

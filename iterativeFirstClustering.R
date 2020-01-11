@@ -111,11 +111,9 @@ hitCommunities <- function(group) {
     nBatches <- ceiling(nHits^2 / 2^28)
 
     # in the following, a hit corresponds to a row index in the "hits" table
-    # we split the hits into several batches (1 batch by default)
-    hitBatches <- list(1:(nHits - 1L))
-    if (nBatches > 1) {
-        hitBatches <- splitEqual(hitBatches[[1]], n = nBatches)
-    }
+    # we split the hits into several batches 
+    hitBatches <- splitEqual(1:(nHits - 1L), n = nBatches)
+
 
     # we "connect" hits 2 by 2 according to criterion 1, with this function:
     criterion_1 <- function(batch) {

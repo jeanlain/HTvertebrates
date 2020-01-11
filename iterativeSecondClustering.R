@@ -96,10 +96,10 @@ communityPairStats <- function(superFam) {
 
         nHits <- nrow(hits)
         nBatches <- ceiling(nHits^2 / 2^28)
-        hitBatches <- list(1:(nHits - 1L))
-        if (nBatches > 1) {
-              hitBatches <- splitEqual(hitBatches[[1]], n = nBatches)
-          }
+        
+        # we split the hits into several batches 
+        hitBatches <- splitEqual(1:(nHits - 1L), n = nBatches)
+        
 
         # this function "connects" hits according to the criterion, similar to what we did in the first round
         criterion_1 <- function(hitBatch) {

@@ -5,34 +5,17 @@
 ##  This stage downloads the species's genomes from ncbi   #
 #                                                          #
 ## %######################################################%##
-####### it's probably better to run this script via: Rscript 1-downloadGenomes.R
+
+# it's probably better to run this script via: Rscript 1-downloadGenomes.R
 
 
-##### first installing the required packages -----------------------------------------------------------
-install.packages(c(
-    "stringi",
-    "data.table",
-    "matrixStats",
-    "ape",
-    "igraph",
-    "seqinr",
-    "RcolorBrewer"
-))
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager")
-}
-
-BiocManager::install("Biostrings")
-
-
-#### now downloading the genomes -----------------------------------------------------------
 
 source("HTvFunctions.R")
 
 genomeFolder <- "genomes/"
 dir.create(genomeFolder)
 
-# importing the table of species description
+# we import the table of species description
 # fread() doesn't like this file, hence the use of read.table()
 genomesInfo <- fread("supplementary-data1-genomes_and_accessions.txt" )
 
