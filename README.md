@@ -66,10 +66,11 @@ TEKaKs.R demo_TeKaKs/TEhitFile.txt demo_TeKaKs/blastxFile.txt demo_TeKaKs/fastaF
 ```
 where "demo_TeKaKs/output" is the output folder (automatically created) and "2" is the number of CPU to use.
 
-Results will be found in "demo_TeKaKs/output". "allKaKs.txt" is a tabular file containing results for all jobs. 
-It contains the following fields:
+Results will be found in "demo_TeKaKs/output".
+
+"allKaKs.txt" is a tabular file containing results for all jobs. It contains the following fields:
 - "hit" is an identifier for each HSP, which corresponds to the row index of each HSP in "TEhitFile.txt".
-- "ka", "ks", "vka", and "vks" are the results of Ka and Ks computations (see the kaks() function of seqinr), 
+- "ka", "ks", "vka" and "vks" are the results of Ka and Ks computations (see the kaks() function of seqinr), 
 - "length" is the length of the alignment on which the above were computed.
 - "nMut" is the number of mutations in this alignment.
 - "K80distance" and "rawDistance" are molecular distances (according to Kimura 1980 or without any correction) between sequences in the HSP. These are computed before any of the processing required for the Ka Ks computations.
