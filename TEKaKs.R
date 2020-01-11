@@ -1,6 +1,9 @@
-#                                                                  #
-#### This script computes pairwise Ka/Ks and overal molecular distance between homologous TEs  ##
-
+##%######################################################%##
+#                                                          #
+####      This script computes pairwise Ka/Ks and       ####
+####  overal molecular distance between homologous TEs  ####
+#                                                          #
+##%######################################################%##
 
 # this script is run at step 7 and at step 13
 
