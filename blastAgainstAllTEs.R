@@ -1,7 +1,7 @@
 ## %######################################################%##
 #                                                          #
 ####            this script blasts TE copies            ####
-####           in retained hit groups againts           ####
+####           in retained hit groups against           ####
 ####                all TEs of the host                 ####
 ####        species, to check the reliability of        ####
 ####            transfers (by the number of             ####
@@ -30,7 +30,7 @@ fasFiles <- list.files(
     full.names = T
 )
 
-# we extact species names from file names
+# we extract species names from file names
 sp <- extractSpeciesNames(basename(fasFiles))
 
 # we also list blastn databases (only .nin files) of TEs for all species,
@@ -48,7 +48,7 @@ dbs <- gsub(
     x = dbs
 )
 
-# extact species names from database names
+# we extract species names from database names
 dbSp <- extractSpeciesNames(dbs)
 
 # so that we can order db files to match query files
@@ -56,7 +56,7 @@ dbs <- dbs[match(sp, dbSp)]
 
 dir.create("TEs/clustering/testConta/blastn/done", recursive = T) # were output files will go
 
-# names of fiture ouput files during the work
+# names of future output files during the work
 outFiles <- stri_c(
     "TEs/clustering/testConta/blastn/",
     sp,

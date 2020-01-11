@@ -9,15 +9,15 @@
 #                                                          #
 ## %######################################################%##
 
-# The principle is to replace a species by a random one amond the 307 species
+# The principle is to replace a species by a random one among the 307 species
 # and compute the number of transfers that involves each species (or rather, each taxon)
 # Hence, the distribution of htt event per species is not changed in a sense that 
-# if species 1 was involved in 10 event and species 2 had 20, swapping these species
+# if species 1 was involved in 10 events and species 2 had 20, swapping these species
 # will not affect the numbers. There would sill be 10 transfers for one species and
-# 20 for the other.
+# 20 for another.
 
-# as several species are found for each clade of a hit group, we select
-# only consider the pair of species involved in the best hit (see paper)
+# as several species are found for each clade of a hit group, we only
+# consider the pair of species involved in the best hit (see paper)
 
 source("HTvFunctions.R")
 tree <- read.tree("timetree.nwk")
@@ -28,7 +28,7 @@ retainedHits <- fread("supplementary-data4-retained_hits")
 
 
 # STEP ONE, permutation of species --------------------------------------------------------------------------------
-# we launch the dedicate script to perform the permutations on 20 CPUs
+# we launch the dedicated script to perform the permutations on 20 CPUs
 system('sbatch --mail-type=BEGIN,END,FAIL --cpus-per-task=20 --mem=20G --wrap="Rscript permutateSpeciesInHits.R 20"')
 
 
@@ -40,10 +40,10 @@ randomHTTs <- readRDS("permutations/allPermutations_Node.308.RDS")
 
 taxa <- fread("namedClades.txt")
 
-# we retreive the species (tip numbers in the tree) composing each taxon that will be shown on the figure
+# we retrieve the species (tip numbers in the tree) composing each taxon that will be shown on the figure
 sps <- tipsForNodes(tree, taxa[onPlot == T, node])
 
-# taxon[x] belonw gives the taxon of species x
+# taxon[x] below gives the taxon of species x
 taxon <- sps[, node[order(tip)]]
     
 
@@ -61,7 +61,7 @@ countHTTs <- function(superfamily) {
     # we count the numbers of transfers involving each taxon in each permutation (note that repl == 0 for real HTT events)
     counts <- unFolded[, .(N = .N / 2), by = .(taxon, repl)]
     
-    # we retreive the number of permutations
+    # we retrieve the number of permutations
     nRepl <- max(randomHTTs[[superfamily]]$repl)
     
     # we need to add 0 counts for taxa not involved in HTT in each replicate
@@ -69,7 +69,7 @@ countHTTs <- function(superfamily) {
     # for this we need to know the taxa involved
     uTaxa <- unique(taxon)
     
-    # ad we create a table indicating 0 transfper for each taxon in each replicate
+    # ad we create a table indicating 0 transfer for each taxon in each replicate
     missingTaxa <- data.table(
         taxon = rep(uTaxa, nRepl),
         repl = rep(1:nRepl, each = length(uTaxa)),
@@ -119,7 +119,7 @@ permutationStats[, class := ifelse(
     no = "RNA"
 )] 
 
-# we compute stats for randomized and observed HTT numbers of the different taxa we selected and for each TE class
+# we compute stats for randomised and observed HTT numbers of the different taxa we selected and for each TE class
 # this means that we sum stats obtained over super families within classes
 statsPerClass <- permutationStats[, .(
     simulated = sum(simulated),
@@ -139,10 +139,11 @@ statsPerClass <- statsPerClass[order(sumSimulated[match(taxon, node), -V1], clas
 
 # building the connected barplots (figure 3)
 
-# we attribute taxa-specific color used for the plots, the same as on figure 2
+# we attribute taxa-specific colour used for the plots, the same as on figure 2
 statsPerClass[, col := taxa[match(taxon, node), col]]
     
-# this function generates the linked barplot figure. Almost all the code adds stars for siginificance levels
+# this function generates the linked barplot figure. 
+# Almost all the code adds stars for siginificance levels
 linkedPlots <- function(dt, space = 2, legend = F, ...) {
     
     b <- dt[, linkedBarPlot(
@@ -158,7 +159,7 @@ linkedPlots <- function(dt, space = 2, legend = F, ...) {
     # no star by default
     dt[, stars := ""]
     
-    # difference at the 5% level when observed numbers are beyound the right quantiles
+    # difference at the 5% level when observed numbers are beyond the right quantiles
     dt[observed < qL5 | observed > qR5, stars := "*"]  
     
     # at the 1% level
@@ -231,7 +232,7 @@ pdf(
 )
 
 
-# in this layoud, the rightmost section is there to leave room for the legend 
+# in this layout, the rightmost section is there to leave room for the legend 
 layout(cbind(1, 2, 3), widths = c(1, 1, 0.4))
 
 par(
@@ -241,8 +242,12 @@ par(
     mai = c(0.6, 0.55, 0.55, 0.6)
 )
 
+# the barplots for DNA transposons
 linkedPlots(statsPerClass[class == "DNA"], ylab = "number of transfers")
+
+#and for retrotranspons
 linkedPlots(statsPerClass[class == "RNA"], legend = T)
+
 dev.off()
 
 
@@ -257,12 +262,12 @@ writeT(rayFin, "tableS1.txt")
 
 
 
-# ADDITIONNAL ANALYSES NOT DETAILED IN THE PAPER ---------------------------------------------
+# ADDITIONAL ANALYSES NOT DETAILED IN THE PAPER ---------------------------------------------
 # investigating if more transfers between "fishes" and tetrapods involved aquatic tetrapods 
 # we first create a list indicating the main habitat of the species (species are tip numbers on the timetree)
 tetrapods <- tipsForNode(tree, 375)
 
-# we retreive the aquatic species among tetrapods
+# we retrieve the aquatic species among tetrapods
 aquatic <- c(
     tipsForNodes(tree, c(376, 472, 474, 514, 501, 463))$tip,
     grep("Trichechus", tree$tip.label)
@@ -272,8 +277,8 @@ aquatic <- c(
 fishes <- setdiff(1:length(tree$tip.label), tetrapods)
 
 habitatEffect <- function(tetrapods, aquatic) {
-    # this permutates tetrapod species among the tetrapod-fish HTT. This is fast
-    # since this cannot general illegal HTTs (the randomized hit will still be
+    # this permutes tetrapod species among the tetrapod-fish HTT. This is fast
+    # since this cannot general illegal HTTs (the randomised hit will still be
     # between fishes and tetrapods)
     
     tetraHits <- HTThits[(sp1 %in% tetrapods &

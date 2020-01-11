@@ -1,8 +1,8 @@
 ## %######################################################%##
-#                                                          #
-####  This stages blasts TE copies against the databse  ####
-#### of repeat proteins to find protein regions in TEs. ####
-#                                                          #
+#                                                           #
+####  This stages blasts TE copies against the database  ####
+#### of repeat proteins to find protein regions in TEs.  ####
+#                                                           #
 ## %######################################################%##
 # this script is executed at step 7 of the pipeline
 
@@ -11,8 +11,8 @@
 # retrotransposons), we blast copies once to retain only the best hit per copy,
 # then we extract TE parts that are not in HSPs, and blast them again. Five
 # "rounds" of blast searches are performed. We do that rather than retrieving
-# many hits per TE in a single blast because this gives not garanty to find all
-# the porteins of the TE (most of the hits would be likely to inolve the same TE
+# many hits per TE in a single blast because this gives not guaranty to find all
+# the proteins of the TE (most of the hits would be likely to involve the same TE
 # region that aligns on homologous proteins of repbase).
 
 # but doing so require blasting sub-part of copies, and some particular care
@@ -107,7 +107,7 @@ m <- mcMap(successiveBlastx,
 )
 
 # we concatenate the output
-# these are for the combined outputs of the different rouds
+# these are for the combined outputs of the different rounds
 system("cat blastx/done/*.out > blastx/all.copies.successiveBlastx.out")
 
 # and these are the "raw" uncombined outputs

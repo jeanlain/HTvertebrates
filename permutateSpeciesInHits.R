@@ -19,8 +19,8 @@ args <- commandArgs(trailingOnly = TRUE)
 # number of CPUs to use
 nCPUs <- as.integer(args[1])
 
-# an secon optional argument is a node number to permutate only species within this clade. 
-# Defaults to the basal node to permutate all species
+# an second optional argument is a node number to permute only species within this clade. 
+# Defaults to the basal node to permute all species
 tree <- read.tree("timetree.nwk")
 node <- ifelse(is.na(args[2]), which.max(node.depth(tree)), as.integer(args[2]))
 
@@ -33,7 +33,7 @@ maxn <- ceiling(n / nCPUs)
 
 
 
-# STEP ONE, we select the hits and delinate the scope of permutations -------------------------------------------
+# STEP ONE, we select the hits and delineate the scope of permutations -------------------------------------------
 
 # we import the hit representing htt
 retainedHits <- fread("supplementary-data4-retained_hits.txt")
@@ -45,8 +45,8 @@ retainedHits <- fread("supplementary-data4-retained_hits.txt")
 # we put the best hits on top 
 setorder(retainedHits, -pID)
 
-# so we extract the one we one (note that we only consider "independent" transfeers)
-# abd we replace species names with tip numbers at the same time
+# so we extract the one we one (note that we only consider "independent" transfers)
+# and we replace species names with tip numbers at the same time
 HTThits <- retainedHits[independent == T, .(
     sp1 = chmatch(sp1[1], tree$tip.label),
     sp2 = chmatch(sp2[1], tree$tip.label),
@@ -55,7 +55,7 @@ HTThits <- retainedHits[independent == T, .(
 ), by = .(hitgroup, superfamily)]
 
 
-# we determine the scope of permutations. Ideally, we permutate species involved in htt within a TE super family, 
+# we determine the scope of permutations. Ideally, we permute species involved in htt within a TE super family, 
 # but some contain too few HTT for this to be meaningful, 
 # and others contain too many, which makes impossible to obtain only "legal permutations"
 # to make our choices, we compute the number of independent transfers per super family, 
@@ -71,7 +71,7 @@ nTr[, combined := ifelse(test = N < 20,
                          yes = paste("other", class, sep = " "),  #for pooled superfamilies, we use "other" + the TE class
                          no = superfamily)]
 
-# we replace names of underepresented super families with the combined names
+# we replace names of underrepresented super families with the combined names
 HTThits[, superfamily2 := nTr[chmatch(HTThits$superfamily, superfamily), combined]]
 
 # we recompute the numbers of transfers with the pooled super families
@@ -80,7 +80,7 @@ nTr <- nTr[, .(N = sum(N)), by = combined]
 # as there may be too many hits per superfamily to obtain only "legal" permutations, 
 # we will split certain super families in batches of hits (when they encompass more than 120 transfers)
 # we add a column for the number of time a superfamily has been seen in a transfer
-HTThits[, occ := occurences(superfamily)]
+HTThits[, occ := occurrences(superfamily)]
 
 # we compute the max number of transfers we allow per superfamily batch
 nTr[, maxi := N / ceiling(N / 121)]
@@ -119,18 +119,18 @@ divTimeMat <- cophenetic(tree)
 # (a species here is a row/column index of the logical matrix)
 tooClose <- divTimeMat < 240
 
-# we retrieve the species we will permutate (tip numbers of the tree, for the clade/node we focus on)
+# we retrieve the species we will permute (tip numbers of the tree, for the clade/node we focus on)
 toShuffle <- tipsForNode(tree, node)
 
 
-# STEP TWO, we permutate species for htts (hits) of a batch ----------------------------------------------------------
+# STEP TWO, we permute species for htts (hits) of a batch ----------------------------------------------------------
 shuffleSpecies <- function(hits, superfamily) {
     # we print progress, which is the only use of the superfamily argument
     print(superfamily)
     
     # to speeds things up, we generate 10^5 permutations in a row as the vast
     # majority lead to invalid transfers. This allows taking advantage of
-    # vectorized functions after that.
+    # vectorised functions after that.
     # for that, we need the number of hits
     nHits <- nrow(hits)
  

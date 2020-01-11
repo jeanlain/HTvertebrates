@@ -8,11 +8,11 @@
 ## %######################################################%##
 
 
-# In this step, we estimate the sequence identiy between all TE copies within
+# In this step, we estimate the sequence identify between all TE copies within
 # all super families with blastn all vs all (referred to as "self blast"
 # afterwards). This will be used to determine of two hits represent the same HTT
 # (identity at the hits is lower than identity between copies in each clade,
-# refered to as "criterion 1" in the paper), and also for the analysis of TE
+# referred to as "criterion 1" in the paper), and also for the analysis of TE
 # evolution within genomes
 
 # this script uses
@@ -31,11 +31,11 @@ httHits <- fread("occ2000ds05.txt")
 
 
 # STEP ONE, we reduce the number of hits ---------------------------------------------------------
-# there are too many hits for this clutering, we only retain 200 of hits
+# there are too many hits for this clustering, we only retain 200 of hits
 # per single-linkage cluster, as hits from the same cluster are very likely
 # to represent the same HTT
 
-# we favor hits that involve the longest protein coding regions
+# we favour hits that involve the longest protein coding regions
 setorder(httHits, -length.aa)
 httHits <- httHits[occ <= 200L, ]
 
@@ -62,13 +62,13 @@ seqtk(
 )
 file.remove("temp.bed")
 
-# STEP THREE, we prepare and laucnh the self blastn within each super family of the copies extracted above ------------------------------------------
+# STEP THREE, we prepare and launch the self blastn within each super family of the copies extracted above ------------------------------------------
 # we will rename copies with integers, to reduce the size of blastn files, and improve speed in further stages
 
 seqs <- readDNAStringSet("TEs/clustering/selectedCopiesKs05occ200.fas")
 copies <- names(seqs)
 
-# we extract super family names and replaces slashes with periods as file names will containes super family names
+# we extract super family names and replaces slashes with periods as file names will contains super family names
 superF <- gsub("/", ".", stri_extract_last(copies, regex = "[^#]+"), fixed = T)
 
 # attributes integer number to copies, which we will used instead of long copy names
@@ -77,7 +77,7 @@ copyID <- data.table(copy = copies, id = 1:length(copies))
 # we write this correspondence to disk as it will be reused many times afterwards
 writeT(copyID, "TEs/clustering/selectedCopiesKs05occ200.IDs.txt")
 
-# we replace copy names with the integers in the sequecnes
+# we replace copy names with the integers in the sequences
 names(seqs) <- copyID[chmatch(names(seqs), copy), id]
 
 dir.create("TEs/clustering/blastn/db", recursive = T)

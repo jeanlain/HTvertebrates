@@ -12,12 +12,12 @@
 # any point at Y = 0 is at the center of the circle (Y should never be < 0). The
 # Y scale is that of the plot area, but the X scale is changed and defined in a
 # parameter vector (circ__, which the user is not supposed to touch but
-# unknowingly defines in initializePlot()) that characterizes the plot. circ__
+# unknowingly defines in initializePlot()) that characterises the plot. circ__
 # specifies the radius of the circle (in Y coordinates) on a normal plot,
 # together with the x coordinate at noon (i.e. starting x, as in a clock), and
-# the x coordinate at midnight, the angle of the cicrle radius at x = 0
-# (noon/midnight) the startnig x (as in a trigonometric circle, in degrees), the
-# direction of rotation as X inscreases (1 is counterclockwise)
+# the x coordinate at midnight, the angle of the circle radius at x = 0
+# (noon/midnight) the starting x (as in a trigonometric circle, in degrees), the
+# direction of rotation as X increases (1 is counterclockwise)
 
 source("HTvFunctions.R") # functions required, but this script was non written specifically for the analysis of HTT
 
@@ -167,7 +167,7 @@ circText <- function(x,
                      curved = F,
                      correct = rotate,
                      ...) {
-    # displays text on a circual plot. Words can be curved to follow the circular X
+    # displays text on a circular plot. Words can be curved to follow the circular X
     # axis. rotate indicates whether the labels should be rotated to keep the same
     # angle (specified by srt, in degrees) relative to the X axis. correct makes
     # sure that no text is written upside down. Non-default fonts are not managed
@@ -266,7 +266,7 @@ circText <- function(x,
 
 subdivisions <- function(diffX, y, resolution = 0.04) {
     # returns the number of subdivisions needed within segments so they appear
-    # properly curved on a circular plot. Resolution is the disance between two
+    # properly curved on a circular plot. Resolution is the distance between two
     # points in inches. Subdivisions only concern the X coordinates since the
     # circular plot is only curved on the x axis.
     meanPerimetre <- min(par("pin")) * pi * y / circ__[1] # length (in inches) of a circle of radius y units, considering that circ__[1] is the max radius that takes the whole plotting region (almost, but we can approximate)

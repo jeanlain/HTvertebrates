@@ -36,15 +36,37 @@ mids <- function(v) {
     (v[i - 1L] + v[i]) / 2L
 }
 
+Split <- function(x, f, drop = FALSE, sep = ".", recursive = F,...) {
+  # splits a vector/table recursively by each factor of "f" if f is a list
+  # and if "recursive" is TRUE
+  
+  ls <- split(x, f, drop = drop, sep = sep, ...)
+  
+  if(recursive & is.list(f)) {
+    for(i in 2:length(f)) {
+      fields = splitToColumns(names(ls), sep)
+      names(ls) <- fields[,ncol(fields)]
+      ls = split(
+        x = ls, 
+        f= data.frame(fields[,1:(ncol(fields)-1L)]), 
+        drop = drop,
+        sep = sep,
+        ...)
+    }
+  }
+  
+  ls
+}
 
-reList <- function(spl, len = NA) {
+reList <- function(list, len = NA) {
     # rearranges a list whose names are integers so that the names of 
     # elements of the list are placed at equivalent indices of a new list.
-    
-    indices <- as.integer(names(spl))
+    # this can be used to optimise the speed of access to the list elements
+  
+    indices <- as.integer(names(list))
     
     if (any(is.na(indices))) {
-        return(spl)
+        return(list)
         stop("some names are not convertible to integers")
     }
     
@@ -55,7 +77,7 @@ reList <- function(spl, len = NA) {
     }
     
     temp <- vector(mode = "list", m)
-    temp[indices] <- spl
+    temp[indices] <- list
     temp
 }
 
@@ -105,7 +127,7 @@ splitEqual <- function(x, f = NA, n, ...) {
 
 
 
-occurences <- function(table) {
+occurrences <- function(table) {
     # returns the occurence of each element of a vector or table (e.g. 1 if it's
     # the first time it appears, 2 if the 2nd time, etc). If vect is a table, it
     # gets the occurence of each row 
@@ -116,20 +138,6 @@ occurences <- function(table) {
     res <- integer(nrow(dt))
     res[counts$pos_] <- counts$occ
     res
-}
-
-
-
-fixRanges <- function(ranges,
-                      starts = 1,
-                      ends = starts + 1) {
-    # fixes ranges so that start positions are never higher than end positions.
-    # Ranges is a dataframe or matrix with 2 numeric columns, "starts" is the
-    # number of the column of start positions
-    
-    f <- ranges[, starts] > ranges[, ends]
-    ranges[f, c(starts, ends)] <- ranges[f, c(ends, starts)]
-    ranges
 }
 
 
@@ -224,7 +232,7 @@ assignToRegion <- function(bed, pos, olv = T) {
     if (length(shorts) < nrow(dt)) {
         # if there are overlapping regions
         
-        # for each of these overlaping regions, we create a vector that represent all the rows of dt that are covered by that region
+        # for each of these overlapping regions, we create a vector that represent all the rows of dt that are covered by that region
         if (length(shorts) == 0) {
             rows <- dt[, .(row = row[1L]:(row[.N] - 1L), size = row[.N] - row[1L]), by = id]
         } else {
@@ -295,7 +303,7 @@ intersection <- function(start,
     # ranges defined by their start and end coordinates (numeric vectors, typically
     # integers). "negative" allows for negative intersection lengths (when ranges
     # do no intersect). If FALSE, intersection lengths cannot be < 0. If the end of
-    # a range is the same of the sart of the other range, the overlap is considered
+    # a range is the same of the start of the other range, the overlap is considered
     # to be olv (a number)
     
     minEnd <- pmin(pmax(start, end), pmax(start2, end2))
@@ -322,11 +330,11 @@ genomeCov <- function(bed,
                       combine = F,
                       successive = T) {
     # computes sequencing depth of a genome by aligned reads, given alignment
-    # starts and ends of reads in a data table in bed-like format. Ouptuts
-    # sucessive interval for a given depth. Ignores intervals covered by less than
+    # starts and ends of reads in a data table in bed-like format. Outputs
+    # successive interval for a given depth. Ignores intervals covered by less than
     # minCov reads. seqLength specify the sequence length in case one wants
     # to record intervals with 0 depth (required for last intervals of contigs that
-    # may have 0 detph). "combine" combines successive intervales covered by at
+    # may have 0 detph). "combine" combines successive intervals covered by at
     # least 1 read (i.e. regions that were sequenced)
 
     # remembers column names of the bed
@@ -408,7 +416,7 @@ genomeCov <- function(bed,
 combineRegions <- function(bed, distance = 0L) {
     # combines regions (a 3-column data table with sequence name, start and end
     # position) that are distant by a certain 'distance'. By default it will
-    # aggregate contigous or overlapping regions, but distance could be > 0
+    # aggregate contiguous or overlapping regions, but distance could be > 0
     # (regions separated by distance pb or less) or negative (requires a certain
     # amount of overlap)
     
@@ -424,7 +432,7 @@ combineRegions <- function(bed, distance = 0L) {
 
 
 compl <- function(bases) {
-    # complements DNA/RNA bases in a charcter string
+    # complements DNA/RNA bases in a character string
     
     chartr(
         "acgtmrwsykvhdbACGTMRWSYKVHDB",
@@ -659,8 +667,8 @@ splitStringInParts <- function(string, size) {
 aaToCDS <- function(aas, cds, collapse = T) {
     # generates a codon alignment based on a protein alignment and the
     # corresponding cds, both being character vectors. Returns a character vector
-    # is collapse is TRUE. If collapse is FALSE, keeps codon separate and returnrs
-    # a list of vector of codons. This fuction does NOT check whether the proteins
+    # is collapse is TRUE. If collapse is FALSE, keeps codon separate and returns
+    # a list of vector of codons. This function does NOT check whether the proteins
     # actually correspond to the cds according to a genetic code
     
     if (any(stri_length(gsub("-", "", aas, fixed = T)) != stri_length(cds) /
@@ -767,7 +775,7 @@ clusterFromPairs <- function(V1,
         }
 
         # will give the correspondance between current cluster ids (the indices of m) and new 
-        # cluters ids (values of m), for replacement. Initially, they are the same
+        # clusters ids (values of m), for replacement. Initially, they are the same
         m <- 1:length(uniq)
     } else {
         m <- 1:max(V1, V2)
@@ -792,7 +800,7 @@ clusterFromPairs <- function(V1,
         # So there's no need to use rows for which the cluster is lower than the query
         mins <- pairs[f, min(s), by = q]
 
-        # and we replace each cluster id by this lowest id in both query and subject culsters 
+        # and we replace each cluster id by this lowest id in both query and subject clusters 
         # (these 2 lines are much faster than a match())
         m[mins$q] <- mins$V1
         pairs[, c("q", "s") := .(m[q], m[s])]
@@ -832,9 +840,9 @@ allPairs <- function(v,
                      same = F,
                      v2 = NA) {
     # returns all possible pairs for elements of a vector, or two vectors (2dn
-    # vector speciefied in v2). Much faster than combn(v, 2). reciprocal = T means
+    # vector specified in v2). Much faster than combn(v, 2). reciprocal = T means
     # reciprocal pairs are returned. sort = T means pairs are sorted alphabetically
-    # or numerically. same tells if pairs comprising the same elment twice should
+    # or numerically. same tells if pairs comprising the same element twice should
     # be returned (only valid if v2 = NA)
     
     if (noDups) {
@@ -896,7 +904,7 @@ combineHits <- function(blast,
                         maxOverlap = 30,
                         maxDiff = 50,
                         blastX = F) {
-    # combines nearby HSPs in a bast tabular output, if these hsps involve the same
+    # combines nearby HSPs in a bast tabular output, if these HSPs involve the same
     # query and subject. Do not combine HSPs that are distant by more than maxDist
     # and overlap by more than maxOverlap. bastX should be TRUE if hits are
     # obtained by blastx
@@ -1102,7 +1110,7 @@ seqtk <- function(fas,
                   formated = F) {
     # calls seqtk to return sequence from a fasta fas, based on bedfile bed.
     # Frite to fasta file out (if specified) or return to R (if not). 
-    #if formated is TRUE, return sequences as a DNAStringset (if not, retursn a character vector 
+    #if formatted is TRUE, return sequences as a DNAStringset (if not, returns a character vector 
     # corresponding to the fasta) ex specifies how seqtk subseq should be executed
     
     if (missing(out)) {
@@ -1129,7 +1137,7 @@ seqtk <- function(fas,
 # FUNCTION THAT ARE MORE SPECIFIC TO THE HTT ANALYSIS ----------------------------------------------------------
 
 extractSpeciesNames <- function(x) {
-    # extacts species names from file names (character vector x) used at various
+    # extracts species names from file names (character vector x) used at various
     # steps of the analysis. genus and species in x must be separated by
     # underscores
     
@@ -1160,7 +1168,7 @@ extractCopies <- function(sp, gff, cons, genome, out, minLen = 300L) {
 
     gff[, family := stri_c(family, "#", superF)]
 
-    # we will compute the proportion of consensuses that have masked sequences (to check if repreat masker worked properly)
+    # we will compute the proportion of consensuses that have masked sequences (to check if repeat masker worked properly)
 
     # imports consensus (=family) names from the fasta file generated by repeat modeler (faster than readDNAStringset)
     cons <- system(paste("grep '>'", cons), intern = T)
@@ -1209,7 +1217,7 @@ extractCopies <- function(sp, gff, cons, genome, out, minLen = 300L) {
     )
 
     # we return metrics on the TE composition of the genome, per superfamily, for selected copies
-    # turns family names to integer numbers, to speed up the commnand below
+    # turns family names to integer numbers, to speed up the command below
 
     selectedCopies[, family := toInteger(stri_c(family, "#", superF))]
     
@@ -1391,7 +1399,7 @@ processBlastX <- function(blast) {
 unalignedParts <- function(blast) {
     # this extracts copy parts that did not align to proteins from the current blastx round, to be aligned with the next blastx round.
     
-    # we do it for copies that had an acceptable HSP (=expected protein family and at least 30 aminoacids aligned), 
+    # we do it for copies that had an acceptable HSP (=expected protein family and at least 30 amino-acids aligned), 
     #since any other hit should be of lower quality (we set max_taget_seqs 1, so we have the best hit possible).
     selectedCopies <- blast[ex > 0 &  length >= 30, unique(query)]
     
@@ -1400,7 +1408,7 @@ unalignedParts <- function(blast) {
         return(data.table())
     }
 
-    # we retreive the alignment coordinates for these selected copies, in all blastx rounds to avoid blasting 
+    # we retrieve the alignment coordinates for these selected copies, in all blastx rounds to avoid blasting 
     # the same parts several time, which is why we needed to concatenate all blastx rounds in the previous function
     coords <- blast[query %in% selectedCopies, .(query, qStart, qEnd)]
 
@@ -1411,7 +1419,7 @@ unalignedParts <- function(blast) {
     # We're not interested in parts between HSPs on the same protein since they should not encompass a different protein
     coords <- coords[, .(start = min(qStart), end = max(qEnd)), by = query]
 
-    # retreiving copy length from start and end positions in contigs = fields 3 and 4 of copy names
+    # retrieving copy length from start and end positions in contigs = fields 3 and 4 of copy names
     copyCoords <- splitToColumns(coords$query, ":", 3:4, mode = "integer")
 
     # this will be used as the end coordinate of each trailing unaligned part
@@ -1644,7 +1652,7 @@ combineHomologous <- function(protRegions, blastp, protSeqs) {
         allP <- allP[pair %chin% blastp[, pair]]
 
         # we will assess how much a region to be converted is covered by the blastp 
-        # HSP with the homologous protein (prot2), so we retreive HSP coordinates.
+        # HSP with the homologous protein (prot2), so we retrieve HSP coordinates.
         allP[, c("qStart", "qEnd") := blastp[match(allP$pair, pair), .(qStart, qEnd)]]
        
         # cov = the proportion of a region that is covered by the alignment with prot2
@@ -1724,11 +1732,11 @@ combineHomologous <- function(protRegions, blastp, protSeqs) {
 }
 
 proteinOverlap <- function(regionComp, blastp, protSeqs) {
-    # determines how much TEs from different communties overlap in respect to the protein-coding regions they cover
+    # determines how much TEs from different communities overlap in respect to the protein-coding regions they cover
     
     regionComp[, protPair := paste(prot, prot2)]
 
-    # retreives HSP coordinates of protein pairs (including self-alignments)
+    # retrieves HSP coordinates of protein pairs (including self-alignments)
     regionComp[, c("qStart", "qEnd", "sStart", "sEnd", "pID", "length") := blastp[match(protPair, pair), .(qStart, qEnd, sStart, sEnd, pID, length)]]
 
     # intersection of left region with the HSP (returned as a range)
@@ -1788,7 +1796,7 @@ ksMode <- function(ks) {
     # threshold we set before, then there is little evidence that the hits
     # represent the lower tail of similarities between inherited TEs.
 
-    # We let the hist() function choose the approriate number of classes
+    # We let the hist() function choose the appropriate number of classes
     h <- hist(ks, plot = F)
 
     # but we modify them because the upper limit of the last class may be higher than the max Ks, so the rightmost class may artificially appear smaller
@@ -1810,8 +1818,8 @@ ksMode <- function(ks) {
 # FUNCTIONS USED TO DRAW FIGURES -------------------------------------------------------
 
 fadeTo <- function(source, dest, amount) {
-    # fades source colors into destination colors, by a certain amount (from 0 to 1). 
-    # alpha is not managed and any transparancy is removed
+    # fades source colours into destination colours, by a certain amount (from 0 to 1). 
+    # alpha is not managed and any transparency is removed
    
     dest <- rep(dest, length.out = length(source))
     sourceLevels <- col2rgb(source) / 255
@@ -1822,7 +1830,7 @@ fadeTo <- function(source, dest, amount) {
 }
 
 saturate <- function(col, amount) {
-    # saturates colors by a certain amount from -1 (greyscale) to 1 (max saturation)
+    # saturates colours by a certain amount from -1 (greyscale) to 1 (max saturation)
     
     amount <- rep(amount, length.out = length(col))
     amount[amount < -1] <- -1
@@ -1944,8 +1952,8 @@ roundedRect <- function(x0,
     # draws a rounded rectangle. First 4 arguments are coordinates of two corners.
     # l is the length of the other rectangle side (that not defined by the two
     # corners). rounding (a number from 0 to 1) and radius (the radius of the
-    # circle arc remplacing a corner) control the amount of rounding. Angle is the
-    # angle of the cricle arc that replaces a corner and nv the number of vertices
+    # circle arc replacing a corner) control the amount of rounding. Angle is the
+    # angle of the circle arc that replaces a corner and nv the number of vertices
     # in that arc. rounding, radius and angle can be defined separately for each
     # corner
     

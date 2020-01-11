@@ -9,26 +9,27 @@
 
 source("HTvFunctions.R")
 
+# this script uses:
+# - the data file provided with the paper: a table of hits representing HTT
+retainedHits <- fread("supplementary-data4-retained_hits.txt")
 
-# we draw the HTTs as arcs connecting tips on a concave tree.
-# we use different colors for DNA and RNA TEs.
-
+# - the timetree
 tree <- read.tree("timetree.nwk")
 
-# data file provided with the paper, which is a table of hits representing HTT
-retainedHits <- fread("supplementary-data4-retained_hits.txt")
+
 
 # we get the data ready for the plot-----------------------------
 
 # we create a table of the best hit per transfer, the one we will show on the tree
-# we thus pace hits whith highest pID on top
+# we thus place hits whith highest pID on top
 setorder(retainedHits, -pID)
 
 # we extract these hits, and the columns we need
 connections <- retainedHits[!duplicated(hitgroup), .(sp1, sp2, superfamily, hitgroup, independent)]
 
-# we will show different colors for the TE class, we determine them based on superfamily name
-connections[, class := ifelse(test = grepl("CMC|hAT|Mariner|Maverick|Merlin|PIF|PiggyBac", superfamily),
+# we will show different colours for the TE class, we determine them based on superfamily name
+connections[, class := ifelse(
+    test = grepl("CMC|hAT|Mariner|Maverick|Merlin|PIF|PiggyBac", superfamily),
     yes = "DNA",
     no = "RNA"
 )]
@@ -38,20 +39,20 @@ connections <- connections[
     sample(.N), # We shuffle rows to ensure that arcs will be drawn in random order,
     # to avoid visual bias between TE classes
     data.table(independent, # We retain the "independent" column to leave us the
-        # option to show independent HTTs or all hit groups.
-        # Species names are converted to integer that
-        # correspond to tip numbers on the tree.
+                            # option to show independent HTTs or all hit groups.
+                            # Species names are converted to integer that
+                            # correspond to tip numbers on the tree.
         tip1 = match(sp1, tree$tip.label),
         tip2 = match(sp2, tree$tip.label),
         col = ifelse(test = class == "DNA",
             yes = rgb(0.9, 0.4, 0.4, 0.4), # red
-            no = rgb(0.4, 0.4, 0.9, 0.4)
+            no = rgb(0.4, 0.4, 0.9, 0.4)   # blue
         )
     )
-] # blue
+] 
 
 
-# rotates some nodes to avoid unnecessary long horizontal branches
+# we rotate some nodes to avoid unnecessary long branches
 for (node in c(308, 389, 390, 477, 391)) tree <- rotate(tree, node)
 
 # this will be the position of species along the circle
@@ -77,7 +78,7 @@ outlinedClades <- cladesOfAge(
 )
 
 # we import a table of taxa (clades) with latin and English names corresponding to tree nodes
-# and colors used in figures 2 and 3, and offset to draw their name at the right place on the tree.
+# and colours used in figures 2 and 3, and offset to draw their name at the right place on the tree.
 # the offset was somewhat determined by trial an error.
 # Some taxa are not shown on the figures but are still in this table
 taxa <- fread("namedClades.txt")
@@ -92,18 +93,21 @@ taxa[
     col := rep_len(saturate(brewer.pal(12, "Set3"), -0.5), .N)
 ]
 
-# we loaf functions required to make the radial figure
+# we load functions required to make the radial figure
 source("circularPlots.R")
 
 pdf("figure2.pdf", 7, 7) # figure 2 of the paper
 
-# see circularPlots.R for these functions
+# see circularPlots.R for the function used
 initializePlot(tipPos + treeDepth, -1, max(xTipPos) + 2L, 180)
 
-# we draw nice curved rectangles around some clades and name the clade --------------------
+
+
+# we draw nice curved rectangles around some clades that we name --------------------
 # Calling the function within the taxa table does not produce a correct pdf, hence the us of with()
 for (i in which(taxa$onTree)) {
-    with(taxa[i, ], outlineTaxon(tree, node, name,
+    with(taxa[i, ], outlineTaxon(
+        tree, node, name,
         x = xTipPos[node] + xOffset,
         y = tipPos + age + 20 + yOffset,
         xMargin = 0.5, yMargin = 5,
@@ -113,16 +117,17 @@ for (i in which(taxa$onTree)) {
     ))
 }
 
+
 # we draw the timescale ----------------------------------------------
-# the ages in My
+# the ages in My:
 ages <- seq(100, 600, 100)
 
-# the tick-marks of the ages
+# we draw the tick-marks of the ages
 circSegments(
-    x0 = -2.3, # the position is just before the first tip (hence degative)
+    x0 = -2.3,          # the position is just before the first tip (hence negative)
     y0 = tipPos + ages, # the "depth" of the tick is defined by the ages
-    x1 = -1.7, # to create segments of appropriate length
-    curved = F, # these segments need not be curved according to the tree
+    x1 = -1.7,          # to create segments of appropriate length
+    curved = F,         # these segments need not be curved according to the tree
     lend = 1, lwd = 0.5
 )
 
@@ -135,19 +140,21 @@ circText(
     correct = F
 )
 
-# we draw the concave tree -------------------------------------------------
+
+# we draw the concave tree itself -------------------------------------------------
 l <- lapply(
     X = brancheLines,
     FUN = function(v) {
         circLines(
-            x = v$y, # x takes column y because fundamentally, this tree is drawn horizontallt
+            x = v$y, # x takes column y because fundamentally, this tree is drawn horizontally
             y = tipPos + treeDepth - v$x,
             lwd = 1, lend = 2, col = grey(0.3)
         )
     }
 )
 
-# we add colored points at the node of outlined clades ------------------------
+
+# we add coloured points at the node of outlined clades ------------------------
 taxa[
     onTree == T & age > 1, # age > 1 to avoid drowing points for single-tip taxa
     circPoints(
@@ -160,6 +167,7 @@ taxa[
     )
 ]
 
+
 # we add curved grey segments above tipes of clades younger than 120 My ---------
 outlinedClades[, circSegments(
     x0 = min(xTipPos[tip]) - 0.2,
@@ -171,6 +179,7 @@ outlinedClades[, circSegments(
 ),
 by = node
 ]
+
 
 # we show HTT event with arcs. ---------------------------------------------------
 # Note that we only show "independent" transfers but we could draw

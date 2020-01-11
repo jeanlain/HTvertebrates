@@ -5,15 +5,19 @@
 #                                                          #
 ####         this stages extracts TE copies from        ####
 ####          genomes using repeatMasker gffs           ####
-# 	and reports statistics on TE composition in species	   #
+#    and reports statistics on TE composition in species   #
 #                                                          #
 ## %######################################################%##
 
+# TEs have been characterised on each genome with repeat modeler
+# and located with repeat masker.
 # repeat modeler and repeat masker jobs were not automated in scripts
+# because they were executed by other authors of the study
 
 # example of repeatModeler job launched from bash, for one genome 
 # (it is assumed that the working directory is specific to one species, and contains the species name in its path):
-# RepeatModeler-open-1.0.10/BuildDatabase -engine ncbi -name mydb genome.fna		#where genome.fna is a species genome (I believe it wouldn't worked on a gzipped fasta)
+# RepeatModeler-open-1.0.10/BuildDatabase -engine ncbi -name mydb genome.fna		
+# where genome.fna is a species genome (I believe it wouldn't worked on a gzipped fasta)
 # RepeatModeler-open-1.0.10/RepeatModeler -engine ncbi -database mydb -pa 8 > run.out
 
 # Then intermediate RepeatModeler files should be removed, as they are so numerous that they would slow the whole system:
@@ -42,13 +46,15 @@
 
 source("HTvFunctions.R")
 
-# peparing output folders -----------------------------------------------------------------------------
+# preparing output folders -----------------------------------------------------------------------------
 
 # folder were statistics on TE will be output
 dir.create("TEs/TEcomposition", recursive = T)
 
 # where TE copies will be exported
 dir.create("TEs/copies")
+
+
 
 
 # STEP ONE, we list the files we need for TE copy extraction ---------------------------------------------------------------------
@@ -83,24 +89,29 @@ genome <- list.files(
 genomes <- data.table(genome, sp = extractSpeciesNames(genome))
 
 
-# we put all these file names in a table, we each row correspond to a species ---------------------------------------
+# as our function to extract copies will use all these files
+# we put these file names in a table, where each row corresponds to a species ---------------------------------------
 m <- merge(gffs, conss, by = "sp", all.x = T)
 m <- merge(m, genomes, by = "sp")
 
-# we add a column for the names of future output files (compressed fastas of TE copies for each species)
+# we add a column for the names of future output files 
+# (compressed fastas of TE copies for each species)
 m[, out := stri_c("TEs/copies/", sp, ".TEs.fasta.gz")]
 
 # we avoid redoing some work in case the script needs to be relaunched
 m <- m[!file.exists(out)]
-sizes <- file.size(m$genome)
 
 # we will process bigger genomes first, not make better use of the CPUs
+# (else, one single job may be running at the end for the largest genome)
+sizes <- file.size(m$genome)
 m <- m[order(sizes, decreasing = T)]
 
 
-# we split the filename table by row, to send to the function below in parallel
+# we split the filename table by row (species) to send to the function below in parallel
+# we don't call mcMap() on the table because it apparently has issues returning tables
 fileList <- split(m, 1:nrow(m))
-# we don't call mcMap on the table because Map() apparently has issues returning tables
+
+
 
 
 # STEP TWO, we extract TE copies and information on TE coposistion for different genomes in parallel -------------------------------------------------

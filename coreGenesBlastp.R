@@ -24,6 +24,7 @@ pairs <- fread("pairsToBlastp.txt", header = T)
 pairs <- pairs[batch %in% job]
 
 # our function that does a search
+# we only retain one hit per query
 blastp <- function(db, aa, out, daa) {
     system(
         paste(
@@ -35,7 +36,7 @@ blastp <- function(db, aa, out, daa) {
             daa
         )
     )
-    system(paste("diamond view -a", daa, "-o", out)) # converting output file to tabular format
+    system(paste("diamond view -a", daa, "-o", out)) # converting output file to tabular format (this version of diamond required it)
     file.remove(daa)
     print(paste(out))
 }

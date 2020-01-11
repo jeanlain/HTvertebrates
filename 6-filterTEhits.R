@@ -7,6 +7,9 @@
 #                                                          #
 ## %######################################################%##
 
+# because these hits are so numerous, we filter the blastn outputs
+# generated at step four before attempting to stack them in a unique table.
+
 # this scipt uses
 # - the blastn output files generated at step 4 
 # - Ks values of BUSCO genes obtained at step 5
@@ -16,9 +19,9 @@
 source("HTvFunctions.R")
 
 # STEP ONE ----------------------------------------------------------------------------------
-# we  filter-out all hits whose pID (not Ks) is lower than
+# we filter-out all hits whose percentage identity (not Ks) is lower than
 # 1 - the 0.5% quantile of Ks of the corresponding clade pair.
-# Hits not passing this filter would have been very unlikey to pass downsteam filters based on TE Ks
+# Hits not passing this filter would have been very unlikely to pass downstream filters based on TE Ks
 # this stage also also removes any hits involving a TE that belongs to a family
 # whose consensus may involve a non-TE gene (see step 3-findDubiousTEs.R)
 
@@ -29,13 +32,13 @@ Ks <- fread("Ks200AAnoRedundancy.txt")
 # we will add this quantile to for every species pair that was blasted
 quant <- Ks[, .(q = quantile(Ks, 0.005)), by = clade]
 
-# to assign species to the calde, we obtain the mrca for each pair of species
+# to assign species to the clade, we obtain the mrca for each pair of species
 tree <- read.tree("timetree.nwk")
 
 mrcaMat <- mrca(tree)
 
 
-# we importe the table of pairs of species whose TEs were compared by blast, generated in 4-blastTEs.R
+# we import the table of pairs of species whose TEs were compared by blast, generated in 4-blastTEs.R
 pairs <- fread("pairsToBlastn.txt", select = c(1, 2, 8))
 
 # we can now add a column indicating the minimum pID to retain blast hits
@@ -54,8 +57,8 @@ TEhits <- fread(
     header = F,
     sep = "\t",
     col.names = c(
-        "query",   # the query TE copy of the blast
-        "subject", # the subject
+        "query",   # the TE copy of the first species (sp1) 
+        "subject", # that of the other species (sp2)
         "sp1",     # the host species of the query
         "sp2",     # and of the subject
         "f1",      # the TE family of the query
@@ -68,8 +71,12 @@ TEhits <- fread(
 # we report the proportion of hits between TEs of the same super family
 TEhits[,mean(superF1 == superF2)]
 
+
+
+
 # STEP TWO, we blast TE copies in retained hits against repeat proteins -------------------------------------------
-# this is to prepare the computation of Ka/Ks between TEs (at other stages)
+# this is to prepare the computation of Ka/Ks between TEs (at later stages)
+# but it is also used to select hits involving an ORF of sufficient length
 
 # we export TE copies involved in hits to blast against rep proteins
 # copies are identified by different fields,
@@ -128,8 +135,8 @@ blastx[,mean(ex == 2L)]
 # (i.e., excluding species and family info), to match the TE-TE hits
 blastx[, copy := copyName(query)]
 
-# we compute the first and last position of all aligments on proteins for each copy,
-# which we infer as the protein region of each copy (even if it may encompasse several ORFs)
+# we compute the first and last position of all alignments on proteins for each copy,
+# which we infer as the protein region of each copy (even if it may encompass several ORFs)
 # this is only done for proteins that are of the same super family as the copy (ex == 2)
 
 perCopy <- blastx[ex == 2L, 
@@ -143,13 +150,16 @@ perCopy <- blastx[ex == 2L,
 
 # to select TE-TE hits that cover a protein region that is long enough,
 # we need to get the blastn coordinates where starts always < ends
-TEhits[, c("qSt", "qEn", "sSt", "sEn") := data.table(fixRanges(cbind(qStart, qEnd)), fixRanges(cbind(sStart, sEnd)))]
+TEhits[, c("qSt", "qEn", "sSt", "sEn") := data.table(pmin(qStart, qEnd),
+                                                     pmax(qStart, qEnd),
+                                                     pmin(sStart, sEnd),
+                                                     pmax(sStart, sEnd))]
 
 # we add portein ranges for query and subject in blastn hits
 TEhits[, c("qS", "qE") := perCopy[chmatch(query, copy), .(start, end)]]
 TEhits[, c("sS", "sE") := perCopy[chmatch(subject, copy), .(start, end)]]
 
-# we prevent bugs that are caused by NAs in interesection()
+# we prevent bugs that are caused by NAs in intersection()
 TEhits[is.na(qS), c("qS", "qE") := 0L]
 TEhits[is.na(sS), c("sS", "sE") := 0L]
 
@@ -180,7 +190,7 @@ TEhitsCoveringProteins[, superF2 := NULL]
 writeT(TEhitsCoveringProteins, "all300aaSameSuperF.txt")
 
 
-# there are still too many hits and copies to compute Ks.
+# there are still too many hits to compute Ks on.
 # We select among redundant hits that may represent the same HTT. ---------------------------------------
 # This is based on the fact that many hits share a copy (see Method section).
 

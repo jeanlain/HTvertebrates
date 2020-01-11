@@ -6,13 +6,25 @@
 #                                                          #
 ## %######################################################%##
 
-# the principle of the approach is detailed in Peccoud et al. 2017 PNAS, supplementary material
+
+
+# We perform a blastx search of all TE consensus sequences generated
+# by RepeatModeler against the non-redundant “nr” protein database of
+# NCBI, using Diamond
+# We do a similar search against a database of known TE proteins. 
+# We discard a TE consensus (hence family) if (i) it has homology to an nr
+# protein over at least 90 amino acids in a region that did not show homology
+# with a RepBase protein and if (ii) this nr protein does not show a homology of
+# at least 35% over >=100 amino acids with a RepBase protein. Homology between
+# proteins is determined by a Diamond blastp search of nr proteins fulfilling
+# criterion (i) against TE proteins. For all searches, we ignore alignments of
+# e-value < 10−3.
 
 # the script uses
-# - the fasta files of repeatModler family consensuses
-# - the repeat masker databse of repeated proteins
+# - the fasta files of repeatmodeler family consensuses
+# - the repeat masker database of repeated proteins
 
-# the output is a file listing names of family consensuses to exclude
+# the output is a text file listing names of family consensuses to exclude
 
 source("HTvFunctions.R")
 
@@ -32,7 +44,7 @@ consensusFiles <- list.files(
     recursive = T
 )
 
-# we determine the species for each consensus fata. As for the previous step, species names must be present in file paths
+# we determine the species for each consensus fasta. As for the previous step, species names must be present in file paths
 species <- extractSpeciesNames(consensusFiles)
 
 # this function  imports a single fasta file
@@ -105,7 +117,7 @@ setorder(blast_nr, qseqid, qstart, -qend)
 blast_nr[, set := regionSets(data.frame(qseqid, qstart, qend))]
 blast_nr <- blast_nr[!duplicated(set)]
 
-# we,combine relatively adjacent hits (with a lot of margin). This function also renames columns
+# we combine relatively adjacent hits (with a lot of margin). This function also renames columns
 combined <- combineHits(
     blast = blast_nr,
     maxDist = 300,
@@ -119,7 +131,7 @@ combined <- combineHits(
 setorder(combined, query, -score)
 
 # attributes a number to every hit related to the same query (starting at 1)
-combined[, hit := occurences(query)]
+combined[, hit := occurrences(query)]
 
 
 
@@ -174,7 +186,7 @@ combinedRep <- combineHits(
 # But since there may be several hit on NR per consensus, we do it on a per-hit (not per-consensus) basis.
 # The first hit per consensus (query) is processed first, then the second, etc.
 
-# the fonctiob below confronts the hit on repbase to the hit on nr for each consensus:
+# the function below confronts the hit on repbase to the hit on nr for each consensus:
 dubious <- function(occ) {
     merged <- merge(
         x = combined[hit == occ],
@@ -202,7 +214,7 @@ dubious <- function(occ) {
 dubiousConsensusHits <- lapply(unique(combined$hit), dubious)
 dubiousConsensusHits <- rbindlist(dubiousConsensusHits)
 
-# we only retain hitson nr proteins that are not annotated as repeat proteins :
+# we only retain hits on nr proteins that are not annotated as repeat proteins :
 dubiousConsensusHits <- dubiousConsensusHits[!grepl(
     pattern = "transpo|retro|reverse|integrase|gag|pol-|pol |rna-dependent|polyprot|mobile|jockey|jerky|setmar|copia|recombinase|crypton|mariner|tcmar|tc1|gypsy|helitron|harbi|piggy|maveri|polinton|academ|ltr|cmc|envelop",
     # the keyword list above has been determined after carefull inspection of protein names in the hits
@@ -270,5 +282,6 @@ dubiousFamilies <- dubiousConsensusHits[!acc %in% repProtAccessions, unique(quer
 # we write these family names to disk. 
 write(dubiousFamilies, "familiesToIgnore.txt")
 
-# We will still blast these TEs to find HTT. Removal of these TEs is done afterwards
+# We still blast these TEs to find HTT.
+# This leaves us the possibility to remove these TEs afterwards
 

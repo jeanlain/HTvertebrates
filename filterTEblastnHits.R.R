@@ -33,7 +33,7 @@ pairs[, out := gsub("/out/", "/done/", stri_c(out, ".gz"), fixed = T)]
 # we will process forward and reverse blast searches (sp1 on sp2, sp2 on sp1) simultaneously,
 # so as to select the best hit among the two reciprocal ones
 
-# we therfore exract the foward search
+# we therefore extract the forward search
 forw <- pairs[sp1 < sp2]
 
 # and the reverse searches
@@ -60,7 +60,7 @@ filterHits <- function(out, rev, filtered, q) {
     # to report the number of hits
     nr <- 0
     if (file.size(out) > 0) {
-        # imports "foward" blast search between two species
+        # imports "forward" blast search between two species
         # we do not name columns as they wont be retained in the output
         blast <- fread(
             paste("gunzip -c", out),

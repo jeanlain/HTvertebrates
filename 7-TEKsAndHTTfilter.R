@@ -1,5 +1,4 @@
 
-
 ## %######################################################%##
 #                                                          #
 ####  This stage computse Ks between TEs for filtered   ####
@@ -70,12 +69,14 @@ seqs <- mcMap(
 # we stack these sequence in a single DNAStringset
 allSequences <- unlist(seqs, use.names = F)
 
-
 # and write it to a single fasta
 write(allSequences, file = "TEKs/selectedCopiesAA300cl2000.fas")
 
 
-# STEP TWO, we prepare and launche computations of Ks value of TE hits. -------------------------------------------
+
+
+
+# STEP TWO, we prepare and launch computations of Ks value of TE hits. -------------------------------------------
 # This is based on blastx results of copies against repeat proteins (used by repeat modeler for TE classification)
 
 
@@ -85,14 +86,18 @@ blastx <- fread(
     input = "TEs/blastx/allRaw.out", 
     header = F, 
     sep = "\t",
-    col.names = c("copy", "prot", "pID", "length", "mismatches", "gapopen", "qStart", "qEnd", "sStart", "sEnd", "eValue", "score", "qlen"),
+    col.names = c(
+        "copy", "prot", "pID", "length", 
+        "mismatches", "gapopen", "qStart", "qEnd", 
+        "sStart", "sEnd", "eValue", "score", "qlen"
+        ),
 )
 
 # we extract copy names and other info
 mat <- blastx[, stri_split(copy, fixed = ":", simplify = T)]
 copies <- stri_c(mat[, 2], mat[, 3], mat[, 4], mat[, 5], sep = ":")
 
-# we sleect hits between copies present in the blastn hits
+# we select hits between copies present in the blastn hits
 f <- copies %chin% selectedHits[, c(query, subject)]
 blastx <- blastx[f]
 
@@ -115,7 +120,7 @@ blastx[, ex := expectedProtein(copy, prot)]
 writeT(blastx, "TEKs/blastxOCC2000EX.out")
 
 
-# selects hits between TEs and rep protein of the same super family, and with sufficient evalue
+# we select hits between TEs and rep protein of the same super family, and with sufficient evalue
 blastx <- blastx[eValue <= 0.001 & ex == 2L]
 
 #we create new start and end coordinates so that the former is always lower

@@ -15,11 +15,11 @@ source("HTvFunctions.R")
 
 dir.create("Ks/KaKs")
 
-# we import all prot and CDS sequences at once
+# we import all protein and CDS sequences at once
 allAA <- readAAStringSet(list.files("CDS", pattern = ".aa.fas", full.names = T))
 allCDS <- readDNAStringSet(list.files("CDS", pattern = ".CDS.fas", full.names = T))
 
-# we list results files of diamond blasp searches (tabular)
+# we list results files of diamond blastp searches (tabular)
 blastpFiles <- list.files(
     "Ks/blastp",
     pattern = ".out",
@@ -34,7 +34,7 @@ sp <- unique(extractSpeciesNames(names(allAA)))
 # we generate all possible pairs of species, no reciprocity
 pairs <- allPairs(sp, reciprocal = F)
 
-# we generate all possible forward searches (ouptut file names)
+# we generate all possible forward searches (output file names)
 allForward <- stri_c("Ks/blastp/", pairs$V1, "/", pairs$V2, ".on.", pairs$V1, ".out")
 
 # all reverse searches

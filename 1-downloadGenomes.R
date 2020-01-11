@@ -25,7 +25,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 BiocManager::install("Biostrings")
 
 
-#### now downlading the genomes -----------------------------------------------------------
+#### now downloading the genomes -----------------------------------------------------------
 
 source("HTvFunctions.R")
 
@@ -45,7 +45,7 @@ links <- fread("ftp_links.txt", select = c(1, 20))
 
 genomesInfo[, Assembly_Accession := gsub("GCF", "GCA", Assembly_Accession)]
 
-# retreives genome project urls by matching accession numbers
+# we retrieve genome project urls by matching accession numbers
 genomesInfo[, url := links[chmatch(Assembly_Accession, assembly_accession), ftp_path]]
 genomesInfo <- genomesInfo[!is.na(url)]
 

@@ -45,7 +45,7 @@ blastn <- function(query, db, out) {
 
         # because this is a self blast, we filter results where the query name (an integer) is < subject name,
         "| awk '{if ($4>=100 && $1<$2) print $0}' >",
-        # this reduce output file size by two (we only retreive the hit copy1 vs copy2, not the reverse).
+        # this reduce output file size by two (we only retrieve the hit copy1 vs copy2, not the reverse).
         out
     ))
 
