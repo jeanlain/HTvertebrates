@@ -50,7 +50,7 @@ The hardware requirement for this demo is a computer with at last 8GB of RAM, 1G
 
 The working directory must be that containing the files of this repository, as stated above.
 
-The demo_TeKaKs directory must be immediately within the working directory. It contains the following:
+The "demo_TeKaKs" directory must be immediately within the working directory. It contains the following:
 - "TEhitFile.txt" is a file of TE-TE HSPs in typical blast tabular format
 - "blastxFile.txt" is a tabular file of TE-protein HSPs. The fields indicate the TE sequence name, start and end coordinates of the HSP on this sequence, start coordinate of the HSP on the protein and whether the TE sequence in aligned on the protein in reverse direction
 - "fastaFile.fas" is a fasta file of the TE sequences whose names are in the two previous file
