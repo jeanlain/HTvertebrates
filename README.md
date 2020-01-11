@@ -34,6 +34,7 @@ The following files are required by the scripts:
 - superF.txt makes the correspondance between repeatModeler family codes (first column), TE class (2nd column) and more common TE superfamily names (3rd column). It is used in steps 15 and 16.
 - supplementary-data3-TEcomposition_per_species.txt is generatd by the scripts and is provided with the paper, but we also provide it here if to facilitate the reproduction of the results.
 
+The directory demo_TeKaKs is provided to demo the script TEKaKs.R (see "Demonstration of TEKaKs.R" below), but is not required to run the pipeline.
 
 ## Installation
 Download all the files of this repository into the same directory.
