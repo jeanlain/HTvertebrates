@@ -42,7 +42,7 @@ Download all the files of this repository into the same directory.
 Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
 Adapting this pipeline to other datasets, hardware configuration, and automating all procedures require modifications to the code. Some parts of the analysis were not automated.
 
-## Demonstration of TEKaKs.R 
+### Demonstration of TEKaKs.R 
 We detail how to run TEKaKs.R on a demo dataset, but we remind that this script (as all others) is not intended for use in any other context than the study associated with the paper.
 The hardware requirement for this demo is a computer with at last 8GB of RAM, 1GB of free hard drive space, and which is able to run R 3.4+ in a terminal.
 The R packages required by HTvFunctions.R must be installed (they are normally installed by 1-downloadGenomes.R)
