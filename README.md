@@ -46,9 +46,7 @@ Adapting this pipeline to other datasets, hardware configuration, and automating
 ### Demonstration of TEKaKs.R 
 We detail how to run "TEKaKs.R" on a demo dataset, but we remind that this script (as all others) is not intended for use in any other context than the study associated with the paper.
 
-The hardware requirement for this demo is a computer with at last 8GB of RAM, 1GB of free hard drive space, and which is able to run R 3.4+ in a terminal.
-
-The other programs mentioned in the Requirements section need not be installed for this demo.
+The hardware requirement for this demo is a computer with at last 8GB of RAM, 1GB of free hard drive space, and which is able to run R 3.4+ in a terminal. The other programs mentioned in the Requirements section need not be installed for this demo.
 
 The working directory must be that containing the files of this repository, as stated above.
 
