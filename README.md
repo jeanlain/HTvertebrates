@@ -6,7 +6,7 @@ These scripts are publicly available to indicate how parts of the analysis were 
 For those who may want to use the pipeline, see below:
 
 ## Requirements
-- [R](https://cran.r-project.org) 3.4+ 
+- [R](https://cran.r-project.org) 3.4+ (required R packages are installed automatically)
 - [RepeatModeler](http://www.repeatmasker.org/RepeatModeler/) 1.0.10
 - [RepeatMasker](http://www.repeatmasker.org/RMDownload.html) 4.0.7
 - [BUSCO](https://gitlab.com/ezlab/busco) 3.0.1
@@ -40,14 +40,13 @@ Download all the files of this repository into the same directory.
 
 ## Usage
 Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
+
 Adapting this pipeline to other datasets, hardware configuration, and automating all procedures require modifications to the code. Some parts of the analysis were not automated.
 
 ### Demonstration of TEKaKs.R 
 We detail how to run "TEKaKs.R" on a demo dataset, but we remind that this script (as all others) is not intended for use in any other context than the study associated with the paper.
 
 The hardware requirement for this demo is a computer with at last 8GB of RAM, 1GB of free hard drive space, and which is able to run R 3.4+ in a terminal.
-
-The R packages required by "HTvFunctions.R" must be installed (they are normally installed by "1-downloadGenomes.R").
 
 The other programs mentioned in the Requirements section need not be installed for this demo.
 
