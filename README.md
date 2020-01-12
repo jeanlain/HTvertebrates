@@ -37,26 +37,30 @@ The files in directory "additonal_files" are required by the scripts:
 The directory demo_TeKaKs is provided to demo the script TEKaKs.R (see "Demonstration of TEKaKs.R" below), but is not required to run the pipeline.
 
 ## Installation
-Download all the files of this repository into the same directory.
+In a bash-compatible terminal, paste
+```
+git clone https://github.com/jeanlain/HTvertebrates.git
+cd HTvertebrates/
+```
 
 ## Usage
-Run R scripts whose name start with numbers in the corresponding order, always from the installation directory, which should be set as the working directory.
+Run R scripts whose name start with numbers in the corresponding order, always from the HTvertebrates/ directory, which should be set as the working directory.
 
 Adapting this pipeline to other datasets, hardware configuration, and automating all procedures require modifications to the code. Some parts of the analysis were not automated.
 
 ### Demonstration of TEKaKs.R 
 We detail how to run "TEKaKs.R" on a demo dataset, but we remind that this script (as all others) is not intended for use in any other context than the study associated with the paper.
 
-The hardware requirement for this demo is a computer with at last 8GB of RAM, 1GB of free hard drive space, and which is able to execute Rscript 3.4+ in a terminal. The other programs mentioned in the Requirements section need not be installed for this demo.
+The hardware requirement for this demo is a computer with at last 8GB of RAM, 1GB of free hard drive space, and which is able to execute R 3.4+ in a terminal. The other programs mentioned in the Requirements section need not be installed for this demo.
 
-The "demo_TeKaKs" directory must be immediately within the working directory. It contains the following:
+The demo_TeKaKs/ directory must be immediately within the HTvertebrates/ directory. It contains the following:
 - "TEhitFile.txt" is a file of TE-TE HSPs in typical blast tabular format.
 - "blastxFile.txt" is a tabular file of TE-protein HSPs. The fields indicate the TE sequence name, start and end coordinates of the HSP on this sequence (where start < end), start coordinate of the HSP on the protein and whether the TE sequence in aligned on the protein in reverse direction.
 - "fastaFile.fas" is a fasta file of the TE sequences whose names are in the two previous file.
 
 The nature of these files is also explained in comments in TEKaKs.R
 
-To run the demo, paste the following in a terminal that is set in the working directory:
+To run the demo, paste the following in the terminal session that you used to install the pipeline:
 ```
 Rscript TEKaKs.R demo_TeKaKs/TEhitFile.txt demo_TeKaKs/blastxFile.txt demo_TeKaKs/fastaFile.fas demo_TeKaKs/output 2
 ```
