@@ -9,17 +9,28 @@
 
 
 # We also use this script to check and install the required packages
-packages <- c("parallel", "stringi", "data.table", "matrixStats", "ape", "igraph", "seqinr", "RColorBrewer")
+packages <- c(
+  "parallel", "stringi", "data.table", "matrixStats", 
+  "Biostrings", "ape", "igraph", "seqinr", "RColorBrewer"
+  )
+
 missing <- setdiff(packages, rownames(installed.packages()))
 
-# if the commands below do not work, packages should be installed manually
-# and another repository may be specified
-if(length(missing) >0) install.packages(missing, repos = "http://cran.us.r-project.org")  
+# if the installation does not work, packages should be installed in interactive mode
+# and/or another repository may be specified
+repository = "https://cran.us.r-project.org"
 
-if (! "Biostrings" %in% rownames(installed.packages())) {
+if(length(setdiff(missing,"Biostrings")) >0) {
+  install.packages(
+  pkgs = setdiff(missing,"Biostrings"), 
+  repos = repository
+  )  
+}
+
+if ("Biostrings" %in% missing) {
   
   if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager")
+    install.packages("BiocManager", repos = repository)
   }
   
   BiocManager::install("Biostrings")
@@ -27,7 +38,7 @@ if (! "Biostrings" %in% rownames(installed.packages())) {
 
 
 # we load the packages we need for the functions below
-l = lapply(setdiff(packages, c("iGraph","seqinr")), require, character.only = TRUE)
+l = lapply(setdiff(packages, c("igraph","seqinr","RColorBrewer")), require, character.only = TRUE)
 
 options("stringsAsFactors" = F)
 options("scipen" = 20)

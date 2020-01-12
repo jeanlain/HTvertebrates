@@ -257,8 +257,8 @@ KaKsForJob <- function(job) { # the only argument is the job number
     alnID <- flattenedSequences$aln
     
     KaKs = data.table(
-        KaKs,
         hit = hits[[job]][alnID],
+        KaKs,
         length = nchar(flattenedSequences$query),
         nMut = nSubstitutions[match(alnID, aln), nMut],
         K80distance = K80distance[alnID],
