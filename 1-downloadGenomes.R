@@ -17,14 +17,14 @@ dir.create(genomeFolder)
 
 # we import the table of species description
 # fread() doesn't like this file, hence the use of read.table()
-genomesInfo <- fread("supplementary-data1-genomes_and_accessions.txt" )
+genomesInfo <- fread("additional_files/supplementary-data1-genomes_and_accessions.txt" )
 
 # we replace spaces in column names
 setnames(genomesInfo, gsub(" ","_", names(genomesInfo), fixed = T))
 
 # we import genome urls retrieved from ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_other
 # and ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_mammalian
-links <- fread("ftp_links.txt", select = c(1, 20))
+links <- fread("additional_files/ftp_links.txt", select = c(1, 20))
 
 genomesInfo[, Assembly_Accession := gsub("GCF", "GCA", Assembly_Accession)]
 

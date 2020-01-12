@@ -123,7 +123,7 @@ ksStats[, threshold := KsThresholds[match(mrca, clade), q05]]
 # we identify the 2 clades (A-C and B-D in the explanation above) that are 
 # involved in every pair of communities ----------------
 # for this we need the timetree
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # the matrix of MRCA for all species of the tree
 mrca <- mrca(tree) 

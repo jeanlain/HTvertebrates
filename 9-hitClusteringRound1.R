@@ -38,7 +38,7 @@ httHits <- fread("occ200Ks05.txt")
 # between species coalescing to an MRCA, we find its clade (the one among the two
 # that diverged from the mrca)
 
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # the different MRCAs of the two species involved in each HTT hits
 mrcas <- httHits[, unique(mrca)]

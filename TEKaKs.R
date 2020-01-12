@@ -16,9 +16,12 @@ args <- commandArgs(trailingOnly = TRUE)
 # - the path to the tabular file of HSPs between TE sequences, with columns query, subject, qStart, qEnd, sStart, sEnd
 TEhitFile <- args[1]
 
-# - the path to the tabular file of HPSs between these sequences and proteins. 
-# Overlaps between HSPs on the same query must be removed. See step 7 to see columns composing this file
-#  All values in query and subject columns in the first file but be found in the query column of this file
+# - the path to a tabular file of HPSs between these sequences and proteins.
+# These  HSPs mustn ot overlap on a given TE (see step 7)
+# This file as fields: TE copy name, start and end coordinates of HSP on the TE (start < end),
+# the start coordinate of the HSP on the protein, and a logical telling whether the HSP is
+# in reverse orientation in respect to the TE
+# All values in query and subject columns in the first file but be found in the copy column of this file
 blastxFile <- args[2]
 
 # - the path to the fasta file containing the TE sequences. 
@@ -278,3 +281,6 @@ res <- mclapply(
 
 
 writeT(data = rbindlist(res), stri_c(outputFolder, "/allKaKs.txt"))
+
+# if we have reached this step, we may remove intermediate files
+unlink(stri_c(outputFolder, "/KaKs.*.txt"))

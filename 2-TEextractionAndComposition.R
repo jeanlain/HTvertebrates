@@ -140,7 +140,7 @@ TEcompo <- TEcomposition[, .(
 
 TEcompo <- TEcompo[number_of_copies_300bp > 0L]
 
-writeT(TEcompo, "supplementary-data3-TEcomposition_per_species.txt") 
+writeT(TEcompo, "additional_files/supplementary-data3-TEcomposition_per_species.txt") 
 
 
 

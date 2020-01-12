@@ -90,7 +90,7 @@ highestSimilarity <- fread(
 # Note that this doesn't require that species are shared between these transfers
 
 # defining the clades requires the species tree
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # We first retreive the host species of each copy of the focal transfer,
 # we encode species as tip numbers of the timetree
@@ -386,7 +386,7 @@ writeT(httHits, "HTThitsAssessed.txt")
 # we import the correspondance between repeat modeler super families and more common super family names,
 # which we will use from now on. This file is provided with the scripts
 corres <- fread(
-    input = "superF.txt",
+    input = "additional_files/superF.txt",
     header = F,
     col.names = c("superFam", "subClass", "newName")
 )

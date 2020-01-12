@@ -15,7 +15,7 @@ require(RColorBrewer)
 retainedHits <- fread("supplementary-data4-retained_hits.txt")
 
 # - the timetree
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 
 
@@ -82,7 +82,7 @@ outlinedClades <- cladesOfAge(
 # and colours used in figures 2 and 3, and offset to draw their name at the right place on the tree.
 # the offset was somewhat determined by trial an error.
 # Some taxa are not shown on the figures but are still in this table
-taxa <- fread("namedClades.txt")
+taxa <- fread("additional_files/namedClades.txt")
 
 # we compute the age of the mrca of the taxa, which is use to
 # find the right position to write taxa names on the tree

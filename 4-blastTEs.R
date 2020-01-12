@@ -19,7 +19,7 @@ source("HTvFunctions.R")
 # we will not search for HTT between species that are too closely related
 
 # hence, we need to timetree of the species
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # we obtain the divergence times between all species (as a matrix).
 distMat <- cophenetic(tree)

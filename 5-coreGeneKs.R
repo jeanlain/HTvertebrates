@@ -121,7 +121,7 @@ m <- mcMap(makedb,
 # we use the timetree to reduce the number of searches. HTT is not inferred between closely related species,
 # and there is no need to measure Ks in all possible species pairs between two large clades (only a subset of species is used)
 
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # the matrix of divergence time between every tip (as a row and column index)
 distMat <- cophenetic(tree)

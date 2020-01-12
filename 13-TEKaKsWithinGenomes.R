@@ -53,7 +53,7 @@ ids <- ids <- fread("TEs/clustering/selectedCopiesKs05occ200.IDs.txt")
 ids[, c("sp", "name") := .(extractSpeciesNames(copy), copyName(copy))]
 
 # We also import the tree to give integer ids (tip numbers) to species, for speed
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # we make the correspondance between the copy id (index of
 # the vector below, as the id is an integer) and species id

@@ -20,7 +20,7 @@
 # consider the pair of species involved in the best hit (see paper)
 
 source("HTvFunctions.R")
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # we import data file provided with the paper, which is a table of hits representing HTT
 retainedHits <- fread("supplementary-data4-retained_hits")
@@ -38,7 +38,7 @@ system('sbatch --mail-type=BEGIN,END,FAIL --cpus-per-task=20 --mem=20G --wrap="R
 # we import the permutations generated above (= pairs of species representing real and simulated HTT)
 randomHTTs <- readRDS("permutations/allPermutations_Node.308.RDS")
 
-taxa <- fread("namedClades.txt")
+taxa <- fread("additional_files/namedClades.txt")
 
 # we retrieve the species (tip numbers in the tree) composing each taxon that will be shown on the figure
 sps <- tipsForNodes(tree, taxa[onPlot == T, node])

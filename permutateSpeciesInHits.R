@@ -21,7 +21,7 @@ nCPUs <- as.integer(args[1])
 
 # an second optional argument is a node number to permute only species within this clade. 
 # Defaults to the basal node to permute all species
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 node <- ifelse(is.na(args[2]), which.max(node.depth(tree)), as.integer(args[2]))
 
 # a third optional argument is the number of replicates we want, defaults to 1000

@@ -192,7 +192,7 @@ copiesInHitGroups$inClade1 <- copiesInHitGroups[, sp %chin% sp1perHitGroup[[hitG
 # distribution, or 0.5)
 
 # for this, we need the species phylogeny
-tree <- read.tree("timetree.nwk")
+tree <- read.tree("additional_files/timetree.nwk")
 
 # we import the table of filtered BUSCO Ks (200 AA alignments and one score per BUSCO gene per pair of clades)
 Ks <- fread(input = "gunzip -c Ks200AAnoRedundancy.txt.gz")

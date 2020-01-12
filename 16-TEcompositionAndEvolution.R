@@ -23,17 +23,21 @@ retainedHits <- fread("supplementary-data4-retained_hits.txt")
 # STEP ONE, we collect stats on TE composition in species, to build the barplots (figure 4) ---------------------------------------------------
 # we import reports on numbers  of copies of at least 300 bp for the different genomes and 
 # super families, generated in step 2
-compo <- fread("supplementary-data3-TEcomposition_per_species.txt")
+compo <- fread("additional_files/supplementary-data3-TEcomposition_per_species.txt")
 
 # we import the correspondance between repeat modeler super families and more common super family names
 corres <- fread(
-    "superF.txt",
+    input = "additional_files/superF.txt",
     header = F,
     col.names = c("superFam", "subClass", "newName")
 ) 
 
 # we add the super family an subclass names to our per-species table
-compo[, c("superfamily", "subClass") := corres[chmatch(RepeatModeler_superfamily, superFam), .(newName, subClass)]]
+compo[, c("superfamily", "subClass") := corres[chmatch(
+  RepeatModeler_superfamily, 
+  superFam
+  ), .(newName, subClass)]]
+
 compo[, class := ifelse(subClass == "DNA", "DNA", "RNA")]
 
 
@@ -45,14 +49,14 @@ perSuperF <- compo[, .(
     nCopies = sum(number_of_copies_300bp),
     nFam = sum(number_of_families),
     bp = sum(as.numeric(total_nucleotides))
-
-    # 
 ), by = .(superfamily, subClass, class)]
 
 
 # we count hit groups and independent htt event per superfamily
-HTTperSuperF <- retainedHits[, .(nTr = length(unique(hitgroup[independent])), 
-                                 nHitGroup = length(unique(hitgroup))), by = superfamily]
+HTTperSuperF <- retainedHits[, .(
+  nTr = length(unique(hitgroup[independent])), 
+  nHitGroup = length(unique(hitgroup))
+  ), by = superfamily]
 
 # the merge below removes super families not involved in HTT since we don't set all = T
 perSuperF <- merge(perSuperF, HTTperSuperF, by = "superfamily", all = F)
