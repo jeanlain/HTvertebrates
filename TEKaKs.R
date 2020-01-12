@@ -88,7 +88,6 @@ TEhits <- lapply(hits, function(batch) {
   })
 
 rm(seqs, covPerCopy) # we reclaim some RAM
-gc()
 
 
 
