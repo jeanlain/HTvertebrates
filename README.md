@@ -66,7 +66,7 @@ Rscript TEKaKs.R demo_TeKaKs/TEhitFile.txt demo_TeKaKs/blastxFile.txt demo_TeKaK
 ```
 where "demo_TeKaKs/output" is the output folder (automatically created) and "2" is the number of CPU to use.
 
-The script should run in less than 5 minutes on a normal computer.
+The script should run in less than 5 minutes on a current desktop PC.
 
 Results will be found in "demo_TeKaKs/output".
 
