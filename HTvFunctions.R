@@ -9,11 +9,12 @@
 
 
 # We also use this script to check and install the required packages
-packages <- c("parallel", "stringi", "data.table", "matrixStats", "ape", "iGrpah", "seqinr", "RColorBrewer")
+packages <- c("parallel", "stringi", "data.table", "matrixStats", "ape", "igraph", "seqinr", "RColorBrewer")
 missing <- setdiff(packages, rownames(installed.packages()))
 
 # if the commands below do not work, packages should be installed manually
-if(length(missing) >0) install.packages(missing)  
+# and another repository may be specified
+if(length(missing) >0) install.packages(missing, repos = "http://cran.us.r-project.org")  
 
 if (! "Biostrings" %in% rownames(installed.packages())) {
   
