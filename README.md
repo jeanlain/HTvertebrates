@@ -37,11 +37,14 @@ The files in directory "additonal_files" are required by the scripts:
 The directory demo_TeKaKs is provided to demo the script TEKaKs.R (see "Demonstration of TEKaKs.R" below), but is not required to run the pipeline.
 
 ## Installation
-In a bash-compatible terminal, paste
+In a bash-compatible terminal that can execute git, paste
 ```
 git clone https://github.com/jeanlain/HTvertebrates.git
 cd HTvertebrates/
 ```
+
+An alternative method is to download https://github.com/jeanlain/HTvertebrates/archive/master.zip and uncompress the zip file.
+
 
 ## Usage
 Run R scripts whose name start with numbers in the corresponding order, always from the HTvertebrates/ directory, which should be set as the working directory.
