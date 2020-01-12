@@ -1,0 +1,42 @@
+DNA/CMC-Chapaev-3	DNA	CMC
+DNA/CMC-EnSpm	DNA	CMC
+DNA/hAT-Ac	DNA	hAT
+DNA/hAT-Blackjack	DNA	hAT
+DNA/hAT-Charlie	DNA	hAT
+DNA/hAT-Tag1	DNA	hAT
+DNA/hAT-Tip100	DNA	hAT
+DNA/Maverick	DNA	Maverick
+DNA/Merlin	DNA	Merlin
+DNA/PIF-Harbinger	DNA	PIF-Harbinger
+DNA/PiggyBac	DNA	PiggyBac
+DNA/TcMar-ISRm11	DNA	Tc1/Mariner
+DNA/TcMar-Mariner	DNA	Tc1/Mariner
+DNA/TcMar-Tc1	DNA	Tc1/Mariner
+DNA/TcMar-Tc2	DNA	Tc1/Mariner
+DNA/TcMar-Tigger	DNA	Tc1/Mariner
+LINE/CR1	LINE	CR1
+LINE/Dong-R4	LINE	Dong-R4
+LINE/I	LINE	I
+LINE/I-Nimb	LINE	I
+LINE/Jockey	LINE	Jockey
+LINE/L1	LINE	LINE 1
+LINE/L1-Tx1	LINE	LINE 1
+LINE/L2	LINE	LINE 2
+LINE/Penelope	LINE	Penelope
+LINE/Proto2	LINE	Proto2
+LINE/R2-Hero	LINE	R2-Hero
+LINE/Rex-Babar	LINE	Rex-Babar
+LINE/RTE	LINE	RTE
+LINE/RTE-BovB	LINE	RTE
+LINE/RTE-RTE	LINE	RTE
+LINE/RTE-X	LINE	RTE
+LTR/Copia	LTR	Copia
+LTR/DIRS	LTR	DIRS
+LTR/ERV1	LTR	ERV
+LTR/ERVK	LTR	ERV
+LTR/ERVL	LTR	ERV
+LTR/Gypsy	LTR	Gypsy
+LTR/Gypsy-Cigr	LTR	Gypsy
+LTR/Ngaro	LTR	Ngaro
+LTR/Pao	LTR	Pao
+RC/Helitron	DNA	Helitron
