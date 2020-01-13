@@ -28,7 +28,13 @@ For those who want to use the pipeline, see below:
 
 The pipeline was not tested with other versions of the above programs, but more recent versions probably work.  
 
-Hardware requirements: a linux cluster with ≥200 CPUs, ≥0.5 TB of system memory,  ≥2 TB of free hard drive space and working internet connection (fiber is recommended). On this hardware, the pipeline should take 1-2 months to complete.
+Hardware requirements: a linux cluster with
+- ≥200 CPUs
+- ≥0.5 TB of system memory
+- ≥2 TB of free hard drive space 
+- an internet connection to download the genome sequences (10 MB/s or more is recommended). 
+
+On this hardware, the pipeline should take 1-2 months to complete.
 
 ## File description
 The R scripts whose names start with numbers performed successive stages of the analysis. The purpose of each script is described by comments at the beginning of the script. 
