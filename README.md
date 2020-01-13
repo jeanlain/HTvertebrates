@@ -106,11 +106,11 @@ Results will be found in `demo_TeKaKs/output`.
 More than 1TB of intermediate files are generated.
 The final output corresponds to results of the publication (please see the publication for their description).
 - `Figure2.pdf`, `Figure3.pdf` and `Figure4.pdf` are produced at steps 14, 15 and 16 respectively. They correspond to figures of the main text
-- `FigureS1.pdf` is generated at step 5. It corresponds to the supplementary figure 1.
-- `FigureS2.pdf` is generated at step 11. It corresponds to the supplementary figure 2.
-- `FigureS3.pdf`, `FigureS4.pdf` and `FigureS5.pdf` are generated at step 16. They corresponds to the supplementary figures 3-5.
-- `tableS1.txt` is generated at step 15. It corresponds to the supplementary table 1.
-- `tableS2.txt` is generated at step 16. It corresponds to the supplementary table 2.
+- `FigureS1.pdf` is generated at step 5. It corresponds to supplementary figure 1.
+- `FigureS2.pdf` is generated at step 11. It corresponds to supplementary figure 2.
+- `FigureS3.pdf`, `FigureS4.pdf` and `FigureS5.pdf` are generated at step 16. They corresponds to supplementary figures 3-5.
+- `tableS1.txt` is generated at step 15. It corresponds to supplementary table 1.
+- `tableS2.txt` is generated at step 16. It corresponds to supplementary table 2.
 - `supplementary-data3-TEcomposition_per_species.txt` is generated at step 2. 
 - `supplementary-data4-retained_hits.txt` is generated step 12. 
 
