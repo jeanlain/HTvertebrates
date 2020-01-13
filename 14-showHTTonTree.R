@@ -97,7 +97,7 @@ taxa[
 # we load functions required to make the radial figure
 source("circularPlots.R")
 
-pdf("figure2.pdf", 7, 7) # figure 2 of the paper
+pdf("Figure2.pdf", 7, 7) # figure 2 of the paper
 
 # see circularPlots.R for the function used
 initializePlot(tipPos + treeDepth, -1, max(xTipPos) + 2L, 180)

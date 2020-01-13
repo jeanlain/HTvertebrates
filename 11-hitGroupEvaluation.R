@@ -269,7 +269,7 @@ by = .(DNA = grepl("DNA", superF), ageClass)
 ]
 
 # makes the plot for DNA transposons (there was no obvious trends for class I TEs) : figure S1 of the paper
-pdf("figureS1.pdf")
+pdf("FigureS1.pdf")
 p <- perAge[DNA == T, plot(
     x = age,
     y = kaks,

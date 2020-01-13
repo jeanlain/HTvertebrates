@@ -2,7 +2,7 @@
 
 ## %######################################################%##
 #                                                          #
-####       This stage permutates species to test        ####
+####       This script permutates species to test       ####
 ####       whether some clades have more htt than       ####
 ####          expected by chance. This can be           ####
 ####          run at any point after step 12.           ####
@@ -226,7 +226,7 @@ linkedPlots <- function(dt, space = 2, legend = F, ...) {
 
 
 pdf(
-    file = "figure3.pdf",
+    file = "Figure3.pdf",
     width = 8,
     height = 4.5
 )
@@ -259,6 +259,8 @@ rayFin <- permutationStats[taxon == 312L, .(
     observed = sum(observed)
 ), by = testSplit(superfamily, ".", 1)]
 writeT(rayFin, "tableS1.txt")
+
+
 
 
 

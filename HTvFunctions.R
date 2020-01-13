@@ -16,8 +16,6 @@ packages <- c(
 
 missing <- setdiff(packages, rownames(installed.packages()))
 
-# if the installation does not work, packages should be installed in interactive mode
-# and/or another repository may be specified
 repository = "https://cran.us.r-project.org"
 
 if(length(setdiff(missing,"Biostrings")) >0) {
@@ -36,6 +34,15 @@ if ("Biostrings" %in% missing) {
   BiocManager::install("Biostrings")
 }
 
+stillMissing <- setdiff(packages, rownames(installed.packages()))
+
+if(length(stillMissing) > 0) {
+  stop(paste(
+    "Package(s)", 
+    paste(stillMissing), 
+    "could not be installed. Consider installing it/them manually.")
+    )
+}
 
 # we load the packages we need for the functions below
 l = lapply(setdiff(packages, c("igraph","seqinr","RColorBrewer")), require, character.only = TRUE)

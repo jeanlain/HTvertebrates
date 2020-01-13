@@ -155,7 +155,7 @@ densities[htt == T, y := -y]
 
 
 # figure 4 of the paper
-pdf("figure4.pdf", width = 7, height = 4.5)
+pdf("Figure4.pdf", width = 7, height = 4.5)
 
 # there will be four plots on the figure
 par(
@@ -334,7 +334,7 @@ allKaKs[,GCcontigDifference := abs(GCcontig1 - GCcontig2)]
 
 
 
-# we are now ready to draw the supplementary figures 5-7---------------------------------------
+# we are now ready to draw the supplementary figures 3-5---------------------------------------
 
 # we will make one plot per TE subclass, but we separate Jockey from LINEs  
 # since Jockey TEs are specifically discussed in the main text
@@ -350,8 +350,8 @@ perSubclass  <- split(
 # so we make a vector for the X-axis titles 
 xNames <- c(
   "Overal molecular distance", 
-  "Difference in GC proportion between copies",
-  "Difference in GC proportion between contigs"
+  "Difference in G+C proportion between copies",
+  "Difference in G+C proportion between contigs"
   )
 
 # the variable names corresponding to these titles:
@@ -363,7 +363,7 @@ for (i in 1:3) {
   # we retrieve the name of the variable to plot horizontally
   variable = names(xNames)[i]  
   
-  pdf(stri_c("figure_s", i + 4, ".pdf"), width = 8.5, height = 11)
+  pdf(stri_c("Figure_s", i + 2, ".pdf"), width = 8.5, height = 11)
   par(mfrow = c(3, 2))
   
   # we make a plot for each TE subclass
@@ -388,7 +388,8 @@ for (i in 1:3) {
     # we plot the results
     perClass[, plot(
       x = meanVar, y = meanKaKs, col = htt + 1, ylim = c(-1, 1), bty = "n", 
-      ylab = "(Ka - Ks) / (Ka + Ks)", xlab = xNames[variable], pch = 16, main = subclass
+      ylab = "(Ka - Ks) / (Ka + Ks)", xlab = xNames[variable], pch = 16, 
+      main = ifelse(subclass == "DNA", "DNA transposons", subclass)
     )]
 
     # we plot standard error segments

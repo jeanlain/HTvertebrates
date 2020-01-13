@@ -1,8 +1,8 @@
 ##%######################################################%##
 #                                                          #
 ####        this scripts counts GC and AT bases         ####
-####             per sequences (contigs) of             ####
-####          different fasta files (genomes)           ####
+####                  per  contigs of                   ####
+####              the different genomes                 ####
 #                                                          #
 ##%######################################################%##
 
@@ -18,6 +18,7 @@ genomes <- list.files(pattern = ".gz", full.names = T, recursive = T)
 # we will process bigger genomes first
 genomes <- genomes[order(-file.size(genomes))]
 
+
 # the fonction that counts GC and AT bases
 GCcontent <- function(file) {
   genome <- readDNAStringSet(file)
@@ -29,7 +30,6 @@ GCcontent <- function(file) {
   dt <- data.table(
       contig = splitToColumns(names(genome), " ", 1), 
       counts, 
-      sp = extractSpeciesNames(file)
       )
   
   setnames(dt, 2:3, c("GC", "AT"))
@@ -38,6 +38,7 @@ GCcontent <- function(file) {
   
   dt
 }
+
 
 # we apply the function in parallel for the different genomes
 res <- mclapply(genomes, GCcontent, mc.cores = nCPUs, mc.preschedule = F)
