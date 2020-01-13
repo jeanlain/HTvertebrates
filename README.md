@@ -6,7 +6,18 @@ These scripts are publicly available to indicate how parts of the analysis were 
 For those who want to use the pipeline, see below:
 
 ## Requirements
-- [R](https://cran.r-project.org) 3.4+ (required R packages are installed automatically)
+- [R](https://cran.r-project.org) 3.4+ with the following packages:
+  - [data.table](https://cran.r-project.org/web/packages/data.table/) 1.11.4
+  - [stringi](https://cran.r-project.org/web/packages/stringi/) 1.2.4
+  - [matrixStats](https://cran.r-project.org/web/packages/matrixStats/) 0.54
+  - [igraph](https://cran.r-project.org/web/packages/igraph/) 1.2.4.1
+  - [ape](https://cran.r-project.org/web/packages/ape/) 5.1
+  - [seqinr](https://cran.r-project.org/web/packages/seqinr/) 3.4-5
+  - [Biostrings](https://bioconductor.org/packages/release/bioc/html/Biostrings.html) 2.52
+  - [RColorBrewer](https://cran.r-project.org/web/packages/RColorBrewer/) 1.1-2
+
+  (If not found, these packages are installed automatically by the pipeline.)
+
 - [RepeatModeler](http://www.repeatmasker.org/RepeatModeler/) 1.0.10
 - [RepeatMasker](http://www.repeatmasker.org/RMDownload.html) 4.0.7
 - [BUSCO](https://gitlab.com/ezlab/busco) 3.0.1
@@ -15,7 +26,7 @@ For those who want to use the pipeline, see below:
 - [seqtk](https://github.com/lh3/seqtk) 1.2-r94 
 - [Slurm Workload Manager](https://slurm.schedmd.com/download.html) 17.11.7
 
-The pipeline was not tested with other versions of the above programs. 
+The pipeline was not tested with other versions of the above programs, but more recent versions probably work.  
 
 Hardware requirements: a linux cluster with ≥200 CPUs, ≥0.5 TB of system memory,  ≥2 TB of free hard drive space and working internet connection (fiber is recommended). On this hardware, the pipeline should take 1-2 months to complete.
 
