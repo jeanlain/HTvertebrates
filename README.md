@@ -95,8 +95,8 @@ The script should run in less than 5 minutes on a current desktop PC.
 Results will be found in `demo_TeKaKs/output`.
 
 `allKaKs.txt` is a tabular file that contains the following fields:
-- `hit` is an identifier for each HSP, which corresponds to the row index of each HSP in "TEhitFile.txt".
-- `ka, "ks", `vka` and `vks` are the results of Ka and Ks computations (see the kaks() function of seqinr), 
+- `hit` is an identifier for each HSP, which corresponds to the row index of each HSP in `TEhitFile.txt`.
+- `ka`, `ks`, `vka` and `vks` are the results of Ka and Ks computations (see the `kaks()` function of `seqinr`), 
 - `length` is the length of the alignment on which the above were computed.
 - `nMut` is the number of substitutions in this alignment.
 - `K80distance` and `rawDistance` are molecular distances (according to Kimura 1980 or without any correction) between sequences in the HSP. These are computed before any of the processing required for the Ka Ks computations.
