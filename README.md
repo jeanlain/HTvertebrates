@@ -64,7 +64,7 @@ Alternatively, download https://github.com/jeanlain/HTvertebrates/archive/master
 
 ## Usage
 Run R scripts whose name start with numbers in the corresponding order, always from the HTvertebrates/ directory, which should be set as the working directory.
-We recommand running these scripts (expect the first script) in interactive mode. 
+We recommand running these scripts (except step 1) in interactive mode. 
 
 Adapting this pipeline to other datasets, hardware configuration, and automating all procedures require modifications to the code. Some parts of the analysis were not automated.
 
