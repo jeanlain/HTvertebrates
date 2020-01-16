@@ -5,7 +5,7 @@
 #                                                          #
 ## %######################################################%##
 
-# This can be run at any point after step 12
+# This can be run at any point after stage 12
 
 source("HTvFunctions.R")
 require(RColorBrewer)

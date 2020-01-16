@@ -2,10 +2,10 @@
 
 ## %######################################################%##
 #                                                          #
-####       This script permutates species to test       ####
+####       This stage permutates species to test        ####
 ####       whether some clades have more htt than       ####
 ####          expected by chance. This can be           ####
-####          run at any point after step 12.           ####
+####          run at any point after stage 12.          ####
 #                                                          #
 ## %######################################################%##
 

@@ -12,7 +12,7 @@
 
 # A reliable hit group (putative HTT) must involve enough TE copies per clade (to
 # reduce the risk that it actually reflects contamination). But since we filtered
-# a lot of hits (hence copies) in previous steps, we evaluate whether copies
+# a lot of hits (hence copies) in previous stages, we evaluate whether copies
 # involved in HTT have close relatives in their respective genomes in order to
 # retrieve similar copies. So we blast copies against the TEs of their host
 # genomes.
@@ -69,8 +69,9 @@ blast <- fread(
     col.names = c("httCopy", "speciesCopy", "pID", "length", "score")
 )
 
-# in these outputs the query "httCopy" is a copy involved the candidate HTT hits and the subject is a TEs of the same species
-# the subject "speciesCopy" may not be one of the copies of the HTT hits, which was the whole point of the blast)
+# in these outputs the query "httCopy" is a copy involved the candidate 
+# hits and the subject is a TEs of the same species the subject "speciesCopy" 
+# may not be one of the copies of the HTT hits, which was the whole point of the blast)
 
 # we remove hits of low quality since none of the retained HTT hits had pID < 75%
 # as well as self hits
@@ -91,7 +92,8 @@ blast[, q := copyIDs[chmatch(httCopy, copy), id]]
 
 # we list all hits (identified their row number) involving a given copy
 
-hitsForCopy <- reList(split(1:nrow(blast), blast$q)) # in this list, hits for copy x are accessed by hitsForCopy[[x]]
+# in the list below, hits for copy x are accessed by hitsForCopy[[x]]
+hitsForCopy <- reList(split(1:nrow(blast), blast$q)) 
 
 # we get all the copy ids per hit group
 copiesInHitGroups <- httHits[, .(copy = unique(c(q, s))), by = hitGroup]
@@ -194,7 +196,8 @@ copiesInHitGroups$inClade1 <- copiesInHitGroups[, sp %chin% sp1perHitGroup[[hitG
 # for this, we need the species phylogeny
 tree <- read.tree("additional_files/timetree.nwk")
 
-# we import the table of filtered BUSCO Ks (200 AA alignments and one score per BUSCO gene per pair of clades)
+# we import the table of filtered BUSCO Ks (200 AA alignments 
+# and one score per BUSCO gene per pair of clades)
 Ks <- fread(input = "gunzip -c Ks200AAnoRedundancy.txt.gz")
 
 # we collect information related to Ks (including columns we don't use afterward)
@@ -207,7 +210,8 @@ KsPerClade <- Ks[Ks < 10, .(
 by = clade
 ]
 
-setorder(httHits, hitGroup, -pID) # this will ensure hitGroupStats generated below is sorted by hit group
+# we ensure that hitGroupStats generated below is sorted by hit group
+setorder(httHits, hitGroup, -pID) 
 
 # we generate statistiques per hit groups to evaluate them. Mainly
 # and number of copies per clade

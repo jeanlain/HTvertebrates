@@ -1,11 +1,11 @@
 ## %######################################################%##
 #                                                          #
 ####               functions used by the                ####
-####        different scripts used the analysis         ####
+####        different scripts of the pipeline           ####
 #                                                          #
 ## %######################################################%##
 
-# some of the functions are used only once in the analysis, but they were not written specifically for it
+# Many of the functions were not written specifically for the pipeline.
 
 
 # We also use this script to check and install the required packages
@@ -16,6 +16,10 @@ packages <- c(
 
 missing <- setdiff(packages, rownames(installed.packages()))
 
+# if the installation does not work, change the repository
+# or install the packages in interactive mode
+# The repository cannot be selected if this script is 
+# executed via Rscript
 repository = "https://cran.us.r-project.org"
 
 if(length(setdiff(missing,"Biostrings")) >0) {
@@ -25,6 +29,7 @@ if(length(setdiff(missing,"Biostrings")) >0) {
   )  
 }
 
+# the Biostrings package is installed differently
 if ("Biostrings" %in% missing) {
   
   if (!requireNamespace("BiocManager", quietly = TRUE)) {
@@ -33,6 +38,7 @@ if ("Biostrings" %in% missing) {
   
   BiocManager::install("Biostrings")
 }
+
 
 stillMissing <- setdiff(packages, rownames(installed.packages()))
 
@@ -44,6 +50,7 @@ if(length(stillMissing) > 0) {
     )
 }
 
+
 # we load the packages we need for the functions below
 l = lapply(setdiff(packages, c("igraph","seqinr","RColorBrewer")), require, character.only = TRUE)
 
@@ -52,6 +59,8 @@ options("scipen" = 20)
 
 
 
+
+# Some "general purpose" functions ---------------------------------------------------------
 
 rescale <- function(x, range) {
     # rescales a numeric vector so that its range (min and max) 
@@ -63,12 +72,14 @@ rescale <- function(x, range) {
     xb - min(xb, na.rm = T) + min(range)
 }
 
+
 mids <- function(v) {
     # returns the midpoints between any two successive elements of v (a numeric vector)
     
     i <- 2:length(v)
     (v[i - 1L] + v[i]) / 2L
 }
+
 
 Split <- function(x, f, drop = FALSE, sep = ".", recursive = F,...) {
   # splits a vector/table recursively by each factor of "f" if f is a list
@@ -92,6 +103,7 @@ Split <- function(x, f, drop = FALSE, sep = ".", recursive = F,...) {
   ls
 }
 
+
 reList <- function(list, len = NA) {
     # rearranges a list whose names are integers so that the names of 
     # elements of the list are placed at equivalent indices of a new list.
@@ -114,6 +126,7 @@ reList <- function(list, len = NA) {
     temp[indices] <- list
     temp
 }
+
 
 toInteger <- function(string,
                       sorted = F,
@@ -154,11 +167,10 @@ splitEqual <- function(x, n, ...) {
 
 
 
-
 occurrences <- function(table) {
     # returns the occurence of each element of a vector or table (e.g. 1 if it's
-    # the first time it appears, 2 if the 2nd time, etc). If vect is a table, it
-    # gets the occurence of each row 
+    # the first time it appears, 2 if the 2nd time, etc). If vect is a table, 
+    # returns the occurence of each row 
     
     dt <- data.table(table)
     dt[, pos_ := 1:.N]
@@ -168,6 +180,143 @@ occurrences <- function(table) {
     res
 }
 
+
+writeT <- function(data, path, ...) {
+  # convenience function to write a data.table to disk with commonly used settings
+  
+  fwrite(
+    data,
+    path,
+    quote = F,
+    row.names = F,
+    na = "NA",
+    sep = "\t",
+    ...
+  )
+}
+
+
+
+splitToColumns <- function(vect,
+                           split,
+                           columns,
+                           empty = "",
+                           mode = "character") {
+  # split a character vector and returns a matrix. Characters are split upon each
+  # occurence of the split argument (a character of length one). empty defines
+  # what the empty cell should be, and mode is the mode of the returned matrix.
+  # This basically does what stri_split_fixed() does, but may sometime be more
+  # convenient or faster
+  
+  vect <- as.character(vect)
+  nc <- stri_length(split)
+  out <- NULL
+  
+  if (!missing(columns)) {
+    cols <- as.integer(columns)
+    cols <- cols[cols >= 1]
+    out <- matrix(empty, length(vect), length(cols))
+  } else {
+    cols <- 1:1000
+  }
+  
+  col <- 1
+  
+  repeat {
+    temp <- vect
+    pos <- as.vector(regexpr(split, vect, fixed = T)) - 1
+    f <- pos >= 0
+    temp[f] <- stri_sub(vect[f], 0, pos[f])
+    
+    if (!missing(columns)) {
+      if (col %in% cols) {
+        out[, match(col, cols)] <- temp
+      }
+    } else {
+      out <- cbind(out, temp)
+    }
+    
+    col <- col + 1
+    
+    if (col > max(cols) | !any(f)) {
+      break
+    }
+    
+    vect[f] <- stri_sub(vect[f], pos[f] + nc + 1, stri_length(vect[f]))
+    vect[!f] <- empty
+  }
+  
+  if (ncol(out) == 1) {
+    out <- as.vector(out)
+  }
+  
+  storage.mode(out) <- mode
+  
+  out
+}
+
+
+
+clusterize <- function(vect, limit, group = "n") {
+  # takes a numeric vector and assigns elements to groups based 
+  # on the maximum distance between them. Returns the groups as integers
+  
+  dt <- data.table(g = group, v = vect)
+  dt$n <- 1:nrow(dt)
+  dt <- dt[order(g, v), ]
+  vect <- dt$v
+  group <- dt$g
+  pos <- 2:length(vect)
+  
+  w <- c(
+    1,
+    which(vect[pos] - vect[pos - 1] > limit |
+            group[pos] != group[pos - 1]) + 1,
+    length(vect) + 1
+  )
+  
+  pos <- 2:length(w)
+  groupSize <- w[pos] - w[pos - 1]
+  group <- rep(1:length(groupSize), groupSize)
+  group[order(dt$n)]
+}
+
+
+
+intersection <- function(start,
+                         end,
+                         start2,
+                         end2,
+                         range = F,
+                         negative = T,
+                         olv = 1L) {
+  # returns the length (or range, if range is TRUE) of intersections for pairs of
+  # ranges defined by their start and end coordinates (numeric vectors, typically
+  # integers). "negative" allows for negative intersection lengths (when ranges
+  # do no intersect). If FALSE, intersection lengths cannot be < 0. If the end of
+  # a range is the same of the start of the other range, the overlap is considered
+  # to be olv (a number)
+  
+  minEnd <- pmin(pmax(start, end), pmax(start2, end2))
+  maxStart <- pmax(pmin(start, end), pmin(start2, end2))
+  if (range) {
+    r <- cbind(maxStart, minEnd)
+    
+    # when ranges do not intersect, the range of the intersection is NA
+    r[maxStart > minEnd, ] <- NA
+    return(r)
+  }
+  inter <- minEnd - maxStart + olv
+  if (!negative) {
+    inter[inter < 0] <- 0L
+  }
+  inter
+}
+
+
+
+
+# Functions related to genetic/genomic ranges (sequence_id, start, end)  or positions ---------------------------------------------------
 
 regionSets <- function(regions) {
     # gives a number ("set" identifier) to all regions that are included in the
@@ -284,10 +433,11 @@ assignToRegion <- function(bed, pos, olv = T) {
 }
 
 
-globalCoords <- function(sequences, pos, seqLengths, seqNames) {
-    # converts sequence/contig positions into unique genome positions assuming contiguous sequences whose lengths and name are provided in order
 
-    
+globalCoords <- function(sequences, pos, seqLengths, seqNames) {
+    # converts sequence/contig positions into unique genome positions assuming
+    # contiguous sequences whose lengths and name are provided in order
+
     names(seqLengths) <- NULL
     seqStart <- cumsum(as.numeric(c(1, seqLengths[-length(seqLengths)])))
     
@@ -298,60 +448,7 @@ globalCoords <- function(sequences, pos, seqLengths, seqNames) {
     }
 }
 
-clusterize <- function(vect, limit, group = "n") {
-    # takes a numeric vector and assigns elements to groups based on the maximum distance between them. Returns the groups as integers
-    
-    dt <- data.table(g = group, v = vect)
-    dt$n <- 1:nrow(dt)
-    dt <- dt[order(g, v), ]
-    vect <- dt$v
-    group <- dt$g
-    pos <- 2:length(vect)
-    
-    w <- c(
-        1,
-        which(vect[pos] - vect[pos - 1] > limit |
-            group[pos] != group[pos - 1]) + 1,
-        length(vect) + 1
-    )
-    
-    pos <- 2:length(w)
-    groupSize <- w[pos] - w[pos - 1]
-    group <- rep(1:length(groupSize), groupSize)
-    group[order(dt$n)]
-}
 
-
-
-intersection <- function(start,
-                         end,
-                         start2,
-                         end2,
-                         range = F,
-                         negative = T,
-                         olv = 1L) {
-    # returns the length (or range, if range is TRUE) of intersections for pairs of
-    # ranges defined by their start and end coordinates (numeric vectors, typically
-    # integers). "negative" allows for negative intersection lengths (when ranges
-    # do no intersect). If FALSE, intersection lengths cannot be < 0. If the end of
-    # a range is the same of the start of the other range, the overlap is considered
-    # to be olv (a number)
-    
-    minEnd <- pmin(pmax(start, end), pmax(start2, end2))
-    maxStart <- pmax(pmin(start, end), pmin(start2, end2))
-    if (range) {
-        r <- cbind(maxStart, minEnd)
-
-        # when ranges do not intersect, the range of the intersection is NA
-        r[maxStart > minEnd, ] <- NA
-        return(r)
-    }
-    inter <- minEnd - maxStart + olv
-    if (!negative) {
-        inter[inter < 0] <- 0L
-    }
-    inter
-}
 
 
 genomeCov <- function(bed,
@@ -444,6 +541,9 @@ genomeCov <- function(bed,
     res
 }
 
+
+
+
 combineRegions <- function(bed, distance = 0L) {
     # combines regions (a 3-column data table with sequence name, start and end
     # position) that are distant by a certain 'distance'. By default it will
@@ -462,6 +562,10 @@ combineRegions <- function(bed, distance = 0L) {
 }
 
 
+
+
+# Functions related to DNA sequences and alignments -------------------------------------------
+
 compl <- function(bases) {
     # complements DNA/RNA bases in a character string
     
@@ -472,6 +576,7 @@ compl <- function(bases) {
     )
 }
 
+
 revCom <- function(seqs) {
     # reverse complements DNA sequences. Ambiguities are not treated
     
@@ -480,86 +585,14 @@ revCom <- function(seqs) {
     seqs
 }
 
-writeT <- function(data, path, ...) {
-    # convenience function to write a data.table to disk with commonly used settings
-    
-    fwrite(
-        data,
-        path,
-        quote = F,
-        row.names = F,
-        na = "NA",
-        sep = "\t",
-        ...
-    )
-}
-
-
-splitToColumns <- function(vect,
-                           split,
-                           columns,
-                           empty = "",
-                           mode = "character") {
-    # split a character vector and returns a matrix. Characters are split upon each
-    # occurence of the split argument (a character of length one). empty defines
-    # what the empty cell should be, and mode is the mode of the returned matrix.
-    # This basically does what stri_split_fixed() does, but may sometime be more
-    # convenient or faster
-    
-    vect <- as.character(vect)
-    nc <- stri_length(split)
-    out <- NULL
-    
-    if (!missing(columns)) {
-        cols <- as.integer(columns)
-        cols <- cols[cols >= 1]
-        out <- matrix(empty, length(vect), length(cols))
-    } else {
-        cols <- 1:1000
-    }
-    
-    col <- 1
-    
-    repeat {
-        temp <- vect
-        pos <- as.vector(regexpr(split, vect, fixed = T)) - 1
-        f <- pos >= 0
-        temp[f] <- stri_sub(vect[f], 0, pos[f])
-        
-        if (!missing(columns)) {
-            if (col %in% cols) {
-                out[, match(col, cols)] <- temp
-            }
-        } else {
-            out <- cbind(out, temp)
-        }
-        
-        col <- col + 1
-        
-        if (col > max(cols) | !any(f)) {
-            break
-        }
-        
-        vect[f] <- stri_sub(vect[f], pos[f] + nc + 1, stri_length(vect[f]))
-        vect[!f] <- empty
-    }
-    
-    if (ncol(out) == 1) {
-        out <- as.vector(out)
-    }
-    
-    storage.mode(out) <- mode
-    
-    out
-}
-
 
 patternLeadingGap <- function(x) {
         # determines the length of pattern leading gaps of pairwise alignments generated by biostrings
     
         stopifnot(is(x, "PairwiseAlignments"), type(x) == "global")
         start(subject(x)) - 1L
-    }
+}
+
 
 subjectLeadingGap <- function(x) {
     # determines the length of subject leading gaps of pairwise alignments generated by biostrings
@@ -686,13 +719,15 @@ splitAlignment <- function(aln, coords, fillGaps = F) {
 
 
 splitStringInParts <- function(string, size) {
-    # splits a character string into a character vector whose word length is defined by "size" (an integer)
+    # splits a character string into a character vector
+    # whose word length is defined by "size" (an integer)
     
     pat <- paste0(".{1,", size, "}")
     res <- stri_extract_all_regex(string, pat)
     names(res) <- names(string)
     res
 }
+
 
 
 aaToCDS <- function(aas, cds, collapse = T) {
@@ -727,6 +762,8 @@ aaToCDS <- function(aas, cds, collapse = T) {
     res
 }
 
+
+
 subSeq <- function(string, start, end, reverse = T) {
     # builds upon Biostrings' subseq() to automatically reverse complement the
     # sequences (by default) if end coordinates are lower than starts. string is an
@@ -744,6 +781,7 @@ subSeq <- function(string, start, end, reverse = T) {
     
     subs
 }
+
 
 
 seqinrAlignment <- function(seqs, names = NULL) {
@@ -772,6 +810,10 @@ seqinrAlignment <- function(seqs, names = NULL) {
     
     aln
 }
+
+
+
+# Functions related to pairs of elements -------------------------------------------------
 
 clusterFromPairs <- function(V1,
                              V2,
@@ -846,6 +888,9 @@ clusterFromPairs <- function(V1,
     match(res, unique(res))
 }
 
+
+
+
 pastePair <- function(string1, string2, sep = "_") {
     # paste elements of string1 and string2 together (character vectors) so that
     # the lower of the two (in alphabetical order) is at the left of the pasted
@@ -863,6 +908,8 @@ pastePair <- function(string1, string2, sep = "_") {
         stri_join(string2, string1, sep = sep)
     )
 }
+
+
 
 allPairs <- function(v,
                      sort = T,
@@ -919,6 +966,8 @@ allPairs <- function(v,
 }
 
 
+
+
 data.tableFromCommunities <- function(comm) {
     # creates a data table from communities generated by iGraph
     
@@ -944,18 +993,8 @@ combineHits <- function(blast,
     setnames(
         blast,
         c(
-            "query",
-            "subject",
-            "identity",
-            "length",
-            "mismatches",
-            "indels",
-            "qStart",
-            "qEnd",
-            "sStart",
-            "sEnd",
-            "evalue",
-            "score"
+          "query", "subject", "identity", "length", "mismatches",
+          "indels", "qStart", "qEnd", "sStart", "sEnd", "evalue", "score"
         )
     )
     
@@ -1025,6 +1064,9 @@ combineHits <- function(blast,
     all
 }
 
+
+
+
 removeReciprocal <- function(blast, removeSelf = T) {
     # removes reciprocal and self hits (if removeSelf = T) from blast results, format 6. Score is expected in column 12.
    
@@ -1045,10 +1087,13 @@ removeReciprocal <- function(blast, removeSelf = T) {
     blastb
 }
 
+
+
+
 cLinkFromPairs <- function(V1, V2, linked) {
     # makes cliques (complete-linkage clusters) from pairs of element (V1 and V2
     # are vectors of equal lengths). linked is a logical that tells which pairs of
-    # elements are linked. The algorithm is described in peccoud et al. 2017 PNAS
+    # elements are linked. The algorithm is described in Peccoud et al. 2017 PNAS
     
     u <- unique(c(V1, V2))
     
@@ -1069,7 +1114,8 @@ cLinkFromPairs <- function(V1, V2, linked) {
         i2 <- chmatch(V2, u)
     }
 
-    # for each element number (index of clique), the element(s) belonging to its clique (values of gr). Originally, an element is just grouped with iself, so this integer vector is suited. But it will become an integer list
+    # for each element number (index of clique), the element(s) belonging to its clique (values of gr). 
+    # Originally, an element is just grouped with iself, so this integer vector is suited. But it will become an integer list
     clique <- 1:length(u)
 
     # all pairs of adjacent elements, with reciprocity.
@@ -1078,11 +1124,12 @@ cLinkFromPairs <- function(V1, V2, linked) {
     # we add to these pairs all elements paired with themselves
     allReciprocalPairs <- rbind(allReciprocalPairs, cbind(clique, clique))
 
-    # so the splitting yields, for each element, a "set" (=value of the list) of all the elements
     set <- split(allReciprocalPairs[, 1], allReciprocalPairs[, 2])
+    #  the splitting yields, for each element, a "set" (=value of the list) of all the elements
     # that are linked to it (and are potentially allowed to be grouped with it), including itself.
     # Because all element numbers were used to split that list, these sets are ordered by element number (set[[n]] is the set for element number n)
-    # so we do not need to fetch a set by name matching => :-)
+    # so we do not need to fetch a set by name matching
+    
     set <- sapply(set, unique)
     
     pb <- txtProgressBar(
@@ -1116,9 +1163,11 @@ cLinkFromPairs <- function(V1, V2, linked) {
                 clique[newGroup] <- list(newGroup)
 
                 # then each element of the new clique has its set become the intersection of the t1 and t2 sets, i.e,
-                set[newGroup] <- list(intersect(set[[t2]], set[[t1]]))
                 # it now contains only elements that are adjacent to BOTH t1 and t2.
-                # Other elements cannot be admitted in the clique as it would break the rule. Note that all sets for elements of the same clique become the same.
+                # Other elements cannot be admitted in the clique as it would break the rule. 
+                # Note that all sets for elements of the same clique become the same.
+                set[newGroup] <- list(intersect(set[[t2]], set[[t1]]))
+                
             }
         }
         setTxtProgressBar(pb, n / length(w))
@@ -1134,38 +1183,191 @@ cLinkFromPairs <- function(V1, V2, linked) {
 
 
 
+# Functions related to trees (phylo-class objects) ----------------------------------------
+
+nestedClades <- function(tree, symmetrical = T) {
+  # from a tree ("phylo" class), returns a matrix were the value is TRUE if the
+  # clade at the column (the "child") is the same as, or nested in, the clade at
+  # the row (the "parent"). If symmetrical is TRUE, the matrix is also TRUE if
+  # the clade at the row is nested within the clade at the column. Uses the fact
+  # that nodes of a phylo object are integer numbers
+  
+  nodes <- unique(as.vector(tree$edge))
+  
+  childs <- lapply(nodes, function(x) {
+    subNodes(tree, x)
+  })
+  
+  childOf <- cbind(
+    parent = rep(nodes, sapply(childs, length)),
+    child = unlist(childs)
+  )
+  
+  mat <- matrix(F, max(childOf), max(childOf))
+  diag(mat) <- T
+  mat[childOf] <- T
+  
+  if (symmetrical) {
+    mat[childOf[, 2:1]] <- T
+  }
+  
+  mat
+}
+
+
+
+MRCA <- function(tree, tips) {
+  # the same as getMRCA() from ape, except it returns 
+  # the tip if only one tip is specified, instead of NULL
+  
+  if (length(tips) == 1) {
+    return(match(tips, tree$tip.label))
+  }
+  getMRCA(tree, tips)
+}
+
+
+nodeDepth <- function(tree, nodes = sort(unique(as.vector(tree$edge)))) {
+  # returns the age, or depth, of nodes of a timetree (nodes specified as integers)
+  
+  len <- node.depth.edgelength(tree)
+  max(len) - len[nodes]
+}
+
+
+
+tipsForNode <- function(tree,
+                        node,
+                        names = F,
+                        itself = F) {
+  # returns all tips for a node from tree, or NULL if node is a tip (except if itself is TRUE). 
+  # Returns tip names if names is TURE, else tip numbers
+  
+  tips <- NULL
+  n <- node
+  
+  while (length(n) > 0) {
+    descendants <- tree$edge[tree$edge[, 1] %in% n, 2]
+    tips <- c(tips, descendants[descendants <= length(tree$tip)])
+    n <- setdiff(descendants, tips)
+  }
+  
+  if (itself & length(tips) == 0) {
+    tips <- node
+  }
+  
+  if (names) {
+    return(tree$tip.label[tips])
+  }
+  
+  tips
+}
+
+
+
+tipsForNodes <- function(tree,
+                         nodes,
+                         names = F,
+                         itself = T) {
+  # returns all tips of several tree nodes, based on tipsForNode()
+  # returns a data.table whose firt column is the node number and second the tips
+  
+  tips <- lapply(nodes, function(x) {
+    tipsForNode(tree, x, names = names, itself = itself)
+  })
+  
+  nSP <- sapply(tips, length)
+  dt <- data.table(node = rep(nodes, nSP), tip = unlist(tips))
+  
+  dt[order(-rep(nSP, nSP))]
+}
+
+
+
+subNodes <- function(tree, node) {
+  # returns all subnodes and tips a tree node
+  
+  descendants <- node
+  subNodes <- NULL
+  
+  repeat {
+    descendants <- tree$edge[tree$edge[, 1] %in% descendants, 2]
+    
+    if (length(descendants) == 0) {
+      break
+    }
+    
+    subNodes <- c(subNodes, descendants)
+  }
+  
+  subNodes
+}
+
+
+cladesOfAge <- function(tree,
+                        age,
+                        withTips = F,
+                        names = T,
+                        singletons = T) {
+  # returns the oldest clades of age ≤ age, from a tree. None of these clades are nested within another
+  
+  ages <- nodeDepth(tree)
+  
+  # all nodes younger than the requested age
+  clades <- which(ages <= age)
+  
+  # to obtain children of nodes
+  edges <- as.data.table(tree$edge)
+  
+  # removes clades that are children of nodes younger than the age. This leaves only the oldest clade of age ≤ minAge
+  clades <- setdiff(clades, edges[V1 %in% clades, ]$V2)
+  
+  if (!singletons) {
+    clades <- setdiff(clades, 1:length(tree$tip.label))
+  }
+  
+  if (!withTips) {
+    return(clades)
+  }
+  
+  tipsForNodes(tree, clades, names = names)
+}
+
+
+
+# Functions that are more specific to the study ----------------------------------------------------------
+
+
 seqtk <- function(fas,
                   bed,
                   out,
                   ex = "seqtk subseq",
                   formated = F) {
-    # calls seqtk to return sequence from a fasta fas, based on bedfile bed.
-    # Frite to fasta file out (if specified) or return to R (if not). 
-    #if formatted is TRUE, return sequences as a DNAStringset (if not, returns a character vector 
-    # corresponding to the fasta) ex specifies how seqtk subseq should be executed
+  # calls seqtk to return sequence from a fasta fas, based on bedfile bed.
+  # Frite to fasta file out (if specified) or return to R (if not). 
+  # if formatted is TRUE, return sequences as a DNAStringset (if not, returns a character vector 
+  # corresponding to the fasta) "ex" specifies how seqtk subseq should be executed
+  
+  if (missing(out)) {
+    seqs <- system(paste(ex, fas, bed), intern = T)
     
-    if (missing(out)) {
-        seqs <- system(paste(ex, fas, bed), intern = T)
-        
-        if (formated) {
-            f <- stri_sub(seqs, 1, 1) == ">"
-            dt <- data.table(content = seqs[!f], id = cumsum(f)[!f])
-            concat <- DNAStringSet(dt[, stri_flatten(content), by = id]$V1)
-            names(concat) <- stri_sub(seqs[f], 2L, nchar(seqs[f]))
-            return(concat)
-            
-        } else {
-            return(seqs)
-        }
-        
+    if (formated) {
+      f <- stri_sub(seqs, 1, 1) == ">"
+      dt <- data.table(content = seqs[!f], id = cumsum(f)[!f])
+      concat <- DNAStringSet(dt[, stri_flatten(content), by = id]$V1)
+      names(concat) <- stri_sub(seqs[f], 2L, nchar(seqs[f]))
+      return(concat)
+      
     } else {
-        system(paste(ex, fas, bed, ">", out))
+      return(seqs)
     }
+    
+  } else {
+    system(paste(ex, fas, bed, ">", out))
+  }
 }
 
 
-
-# FUNCTION THAT ARE MORE SPECIFIC TO THE HTT ANALYSIS ----------------------------------------------------------
 
 extractSpeciesNames <- function(x) {
     # extracts species names from file names (character vector x) used at various
@@ -1174,6 +1376,7 @@ extractSpeciesNames <- function(x) {
     
     stri_extract_last(x, regex = "[A-Z][a-z]+_[a-z]+[_]*[a-z]*")
 }
+
 
 
 extractCopies <- function(sp, gff, cons, genome, out, minLen = 300L) {
@@ -1263,6 +1466,8 @@ extractCopies <- function(sp, gff, cons, genome, out, minLen = 300L) {
     res
 }
 
+
+
 getBUSCOs <- function(folder) {
     # concatenates busco genes of a species (having a specific folder) in 
     # single fasta and renames sequences by adding the species name to each
@@ -1288,6 +1493,7 @@ getBUSCOs <- function(folder) {
     
     print(paste("done", sp))
 }
+
 
 
 translateCDS <- function(cds, aa) {
@@ -1320,8 +1526,10 @@ translateCDS <- function(cds, aa) {
 }
 
 
+
 seqtkDiamond <- function(fas, bed, db, out) {
-    # extract sequences from fasta file fas using bedfile bed and blasts them search against diamond protein database db, to output file out
+    # extract sequences from fasta file "fas" using bedfile "bed" and blasts
+    # them against a diamond protein database "db", to output file "out"
     
     system(
         paste(
@@ -1345,6 +1553,7 @@ seqtkDiamond <- function(fas, bed, db, out) {
     }
 }
 
+
 copyName <- function(x) {
     # in certain files (fastas, mostly), TE copy names must have species and TE
     # family names attached. This function removes them to match copy names in
@@ -1356,6 +1565,7 @@ copyName <- function(x) {
     # extacts the fields we want and concatenates them back
     stri_c(mat[, 2], mat[, 3], mat[, 4], mat[, 5], sep = ":")
 }
+
 
 
 expectedProtein <- function(query, subject) {
@@ -1427,8 +1637,10 @@ processBlastX <- function(blast) {
 }
 
 
+
 unalignedParts <- function(blast) {
-    # this extracts copy parts that did not align to proteins from the current blastx round, to be aligned with the next blastx round.
+    # this extracts copy parts that did not align to proteins in 
+    # a blastx search
     
     # we do it for copies that had an acceptable HSP (=expected protein family and at least 30 amino-acids aligned), 
     #since any other hit should be of lower quality (we set max_taget_seqs 1, so we have the best hit possible).
@@ -1470,164 +1682,25 @@ unalignedParts <- function(blast) {
         end = copyEnd
     )]
     
-    #we stack them in a single table
+    # we stack them in a single table
     parts <- rbind(leading, trailing)
 
-    # returns parts that are at least 100-bp long
+    # we return parts that are at least 100-bp long
     parts[end - start >= 100]
 }
 
 
-nestedClades <- function(tree, symmetrical = T) {
-    # from a tree ("phylo" class), returns a matrix were the value is TRUE if the
-    # clade at the column (the "child") is the same as, or nested in, the clade at
-    # the row (the "parent"). If symmetrical is TRUE, the matrix is also TRUE if
-    # the clade at the row is nested within the clade at the column. Uses the fact
-    # that nodes of a phylo object are integer numbers
-    
-    nodes <- unique(as.vector(tree$edge))
-    
-    childs <- lapply(nodes, function(x) {
-        subNodes(tree, x)
-    })
-    
-    childOf <- cbind(
-        parent = rep(nodes, sapply(childs, length)),
-        child = unlist(childs)
-    )
-    
-    mat <- matrix(F, max(childOf), max(childOf))
-    diag(mat) <- T
-    mat[childOf] <- T
-    
-    if (symmetrical) {
-        mat[childOf[, 2:1]] <- T
-    }
-    
-    mat
-}
 
-MRCA <- function(tree, tips) {
-    # the same as getMRCA function from ape, except it returns the tip if only one tip is specified, instead of NULL
-    
-    if (length(tips) == 1) {
-        return(match(tips, tree$tip.label))
-    }
-    getMRCA(tree, tips)
-}
-
-
-nodeDepth <- function(tree, nodes = sort(unique(as.vector(tree$edge)))) {
-    # returns the age, or depth, of nodes of a timetree (nodes specified as integers)
-    
-    len <- node.depth.edgelength(tree)
-    max(len) - len[nodes]
-}
-
-
-
-tipsForNode <- function(tree,
-                        node,
-                        names = F,
-                        itself = F) {
-    # returns all tips for a node from tree, or NULL if node is a tip (except if itself is TRUE). 
-    # Returns tip names if names is TURE, else tip numbers
-    
-    tips <- NULL
-    n <- node
-    
-    while (length(n) > 0) {
-        descendants <- tree$edge[tree$edge[, 1] %in% n, 2]
-        tips <- c(tips, descendants[descendants <= length(tree$tip)])
-        n <- setdiff(descendants, tips)
-    }
-    
-    if (itself & length(tips) == 0) {
-        tips <- node
-    }
-    
-    if (names) {
-        return(tree$tip.label[tips])
-    }
-    
-    tips
-}
-
-
-tipsForNodes <- function(tree,
-                         nodes,
-                         names = F,
-                         itself = T) {
-    # returns all tips of several tree nodes, based on the function above. 
-    # returns a data.table whose firt column is the node number and second the tips
-   
-     tips <- lapply(nodes, function(x) {
-        tipsForNode(tree, x, names = names, itself = itself)
-    })
-     
-    nSP <- sapply(tips, length)
-    dt <- data.table(node = rep(nodes, nSP), tip = unlist(tips))
-    
-    dt[order(-rep(nSP, nSP))]
-}
-
-subNodes <- function(tree, node) {
-    # returns all subnodes of a tree node, including tips
-    
-    descendants <- node
-    subNodes <- NULL
-    
-    repeat {
-        descendants <- tree$edge[tree$edge[, 1] %in% descendants, 2]
-        
-        if (length(descendants) == 0) {
-            break
-        }
-        
-        subNodes <- c(subNodes, descendants)
-    }
-    
-    subNodes
-}
-
-
-cladesOfAge <- function(tree,
-                        age,
-                        withTips = F,
-                        names = T,
-                        singletons = T) {
-    # returns the oldest clades of age ≤ age, from a tree. None of these clade should be nested within another
-   
-    ages <- nodeDepth(tree)
-
-    # all nodes younger than the requested age
-    clades <- which(ages <= age)
-
-    # to obtain children of nodes
-    edges <- as.data.table(tree$edge)
-
-    # removes clades that are children of nodes younger than the age. This leaves only the oldest clade of age ≤ minAge
-    clades <- setdiff(clades, edges[V1 %in% clades, ]$V2)
-    
-    if (!singletons) {
-        clades <- setdiff(clades, 1:length(tree$tip.label))
-    }
-    
-    if (!withTips) {
-        return(clades)
-    }
-   
-     tipsForNodes(tree, clades, names = names)
-}
-
+# Two functions related to protein-sequence homology between hit communities:
 
 combineHomologous <- function(protRegions, blastp, protSeqs) {
     # combines homologous protein regions among copies in a community. Several
     # similar copies may have a hit to different proteins, which are homologous. We
     # would rather have a single protein than several homologous ones.
+    
+    # we do it iteratively, this is the first round
     n <- 1
 
-    # we do it iteratively, this is the first round
     oneProt <- NULL
     repeat {
         print(paste("round", n, nrow(protRegions), "regions"))
@@ -1762,6 +1835,8 @@ combineHomologous <- function(protRegions, blastp, protSeqs) {
     rbind(protRegions[, -"row"], oneProt)
 }
 
+
+
 proteinOverlap <- function(regionComp, blastp, protSeqs) {
     # determines how much TEs from different communities overlap in respect to the protein-coding regions they cover
     
@@ -1821,9 +1896,10 @@ proteinOverlap <- function(regionComp, blastp, protSeqs) {
 }
 
 
+
 ksMode <- function(ks) {
     # to investigate truncation of TE Ks due to thresholds we imposed, we determine
-    # the mode of the kS within  hit group. If this mode is below the upper
+    # the mode of the kS within a hit group. If this mode is below the upper
     # threshold we set before, then there is little evidence that the hits
     # represent the lower tail of similarities between inherited TEs.
 
@@ -1846,7 +1922,11 @@ ksMode <- function(ks) {
     )
 }
 
-# FUNCTIONS USED TO DRAW FIGURES -------------------------------------------------------
+
+
+
+# Functions used to draw final figures of the paper -------------------------------------------------------
+
 
 fadeTo <- function(source, dest, amount) {
     # fades source colours into destination colours, by a certain amount (from 0 to 1). 
@@ -1859,6 +1939,7 @@ fadeTo <- function(source, dest, amount) {
     levels <- t(sourceLevels) + t(delta) * amount
     rgb(levels[, 1], levels[, 2], levels[, 3])
 }
+
 
 saturate <- function(col, amount) {
     # saturates colours by a certain amount from -1 (greyscale) to 1 (max saturation)
@@ -1875,6 +1956,7 @@ saturate <- function(col, amount) {
     hueSat[hueSat > 1] <- 1
     hsv(hueSat[1, ], hueSat[2, ], hueSat[3, ])
 }
+
 
 
 linkedBarPlot <- function(height,
@@ -1968,6 +2050,7 @@ xyDistance <- function(x0, y0, x1, y1) {
     dY <- y1 - y0
     l <- sqrt(dX^2 + dY^2)
 }
+
 
 roundedRect <- function(x0,
                         y0,
@@ -2095,6 +2178,49 @@ linesFromTree <- function(tree, angular = T) {
     setNames(paths, tree$tip.label)
 }
 
+
+arcSegments <- function(x0, y0, x1, y1, angle = pi, nv = 100, draw = T, ...) { 
+  # draws arcs between points. Angle is the angle of the arc.
+  # The arc is drawn from the first to the second point counterclockwise if the angle is > 0, 
+  # and clockwise if the angle is > 0. nv is the number of points in the line drawn. 
+  # Silenlty returns a list of points to pass to lines() or polygon() for the arcs. Only draws on the plot if draw = T.
+  
+  dX <- x1 - x0
+  dY <- y1 - y0
+  
+  # euclidian distance between the points
+  l <- sqrt(dX^2 + dY^2) 
+  
+  # the radius of the arc
+  radius <- abs(l / (2 * sin(angle / 2))) 
+  
+  # the disance between the midpoint of the 2 points and the center the arc
+  D <- l / (2 * tan(angle / 2)) 
+  
+  # center of the arc coordinates
+  x <- (x0 + x1) / 2 - D * dY / l
+  y <- (y0 + y1) / 2 + D * dX / l
+  
+  # angle between the first point, the arc center, and the X axis
+  startAngle <- (pi - angle) / 2 + atan(dY / dX) 
+  startAngle[xor(dX >= 0, angle < 0)] <- startAngle[xor(dX >= 0, angle < 0)] + pi
+  
+  # we will add points in a line at these angles, with arc center being the center of trigonometric circle
+  angles <- Map(seq, startAngle, startAngle + angle, length.out = nv) 
+  
+  # coordinates of the points of the line(s) to draw
+  xCoords <- Map(function(x, radius, angle) x + radius * cos(angle), x, radius, angles) 
+  yCoords <- Map(function(y, radius, angle) y + radius * sin(angle), y, radius, angles)
+
+  if (draw) Map(lines, xCoords, yCoords, ...)
+  
+  dt <- Map(function(x, y) data.table(x = x, y = y), xCoords, yCoords)
+  
+  invisible(dt)
+}
+
+
+
 outlineTaxon <- function(tree,
                          node,
                          name,
@@ -2148,15 +2274,19 @@ outlineTaxon <- function(tree,
 
     leftX <- x - xMargin
     rightX <- x + wordWidth + xMargin
+    
+    # we adjust the left side of the rectangle to the left side the rectangle 
+    # surrounding the clade, if it's close enough, for best visual effect
     if (abs(leftX - xRange[1] + xMargin) < 2) {
         leftX <- xRange[1] - xMargin
 
-        # adjusts the left side of the rectangle to the left side the rectangle 
-        #surrounding the clade, if it's close enough, for best visual effect
+       
     }
+    
+    # same for the right side (considering that it's very unlikely that the left side was close enough in this case)
     if (abs(rightX - xRange[2] - xMargin) < 2) {
         rightX <- xRange[2] + xMargin
-        # same for the right side (considering that it's very unlikely that the left side was close enough in this case)
+        
     }
     
     # we compute xy coordinates of rounded rectangle around the label
@@ -2174,7 +2304,7 @@ outlineTaxon <- function(tree,
     # we draw it after reestablishing proper X dimensions
     circPolygon(rect[, 1] / ratio, rect[, 2], ...)
     
-     # draws clade label
+    # we draw clade label
     circText(
         x,
         y,

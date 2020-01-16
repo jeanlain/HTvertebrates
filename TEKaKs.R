@@ -5,7 +5,7 @@
 #                                                          #
 ##%######################################################%##
 
-# this script is run at step 7 and at step 13
+# this script is run at stages 7 and 13 of the pipeline
 
 source("HTvFunctions.R")
 require(seqinr)

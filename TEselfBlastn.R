@@ -5,11 +5,10 @@
 #                                                          #
 ## %######################################################%##
 
-# the only user input is the job identifier (see 8-prepareClustering.R) and the number of CPUs to use
 
 # the output are tabular blastn output files
 # these results will be is used to evaluate "criterion 1" for hit clustering
-# and also to investigate TE evolution within genome (stage )
+# and also to investigate TE evolution within genome (stage 13)
 
 library(data.table)
 library(parallel)
@@ -17,7 +16,8 @@ library(parallel)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# the first argument represent job identifiers (integers) separate by comas
+# the first argument represent job identifiers (integers) 
+# separate by comas (see 08-prepareClustering.R)
 job <- as.integer(unlist(strsplit(args[1], ",")))
 
 # the second argument is the number of CPUs to use
@@ -50,12 +50,12 @@ blastn <- function(query, db, out) {
     ))
 
 
-    # moves the output to final destination once finished
+    # we move the output to final destination once finished
     file.rename(out, done)
     return(NULL)
 }
 
-# lauchnes the blast search corresponding to the requested job
+# we launch the blast search corresponding to the requested job
 res <- searches[toDo, mcMap(
     f = blastn,
     query,
@@ -64,4 +64,5 @@ res <- searches[toDo, mcMap(
     mc.cores = min(nCPUs, sum(f)),
     mc.preschedule = F
 )]
+
 print("finished")

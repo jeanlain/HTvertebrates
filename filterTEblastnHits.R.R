@@ -5,11 +5,11 @@
 ####              of different species to               ####
 ####          select hits with sufficient pID           ####
 #      and removes hits involving artefactual TEs          #
-#                   identified at step 3                   #
+#                   identified at stage 3                   #
 #                                                          #
 ## %######################################################%##
 
-# This script is run at step 6-filterTEhits.R
+# This script is run at stage 06-filterTEhits.R
 
 
 library(data.table)
@@ -47,7 +47,7 @@ pairs <- merge(forw, rev)
 pairs[, filtered := gsub(".gz", "", stri_c("TEs/blastn/filtered/", basename(out)))]
 
 
-# we import the names of dubious TE families that may not represent true TEs generated in step 3-findDubiousTEs.R
+# we import the names of dubious TE families that may not represent true TEs generated in stage 03-findDubiousTEs.R
 toRemove <- readLines("TEs/findDubious/familiesToIgnore.txt")
 
 

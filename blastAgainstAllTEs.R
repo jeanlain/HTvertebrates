@@ -11,10 +11,10 @@
 #                                                          #
 ## %######################################################%##
 
-# this script is launched at step 11-hitGroupEvaluation.R
+# this script is launched at stage 11-hitGroupEvaluation.R
 
-# the script reads fastas of copy sequences generated at step 11
-# and uses the blast databases of TE copies generated at step 4-blastTEs.R
+# the script reads fastas of copy sequences generated at stage 11
+# and uses the blast databases of TE copies generated at stage 04-blastTEs.R
 # the output is a blastn tabular output (hits)
 
 source("HTvFunctions.R")
@@ -34,7 +34,7 @@ fasFiles <- list.files(
 sp <- extractSpeciesNames(basename(fasFiles))
 
 # we also list blastn databases (only .nin files) of TEs for all species,
-# these are generated in step 4-blastTEs.R
+# these are generated in stage 04-blastTEs.R
 dbs <- list.files(
     path = "TEs/blastn/db",
     pattern = ".nin",

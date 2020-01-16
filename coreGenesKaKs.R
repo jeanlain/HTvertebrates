@@ -5,7 +5,7 @@
 #                                                           #
 ## %######################################################%##
 
-# this script is run at step 5-coreGeneKs.R
+# this script is run at stage 05-coreGeneKs.R
 
 # the only user input is the number of CPUs to use
 args <- commandArgs(trailingOnly = TRUE)

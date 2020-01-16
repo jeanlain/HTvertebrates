@@ -1,18 +1,20 @@
-## %######################################################%##
-#                                                           #
-####            This stage counts HTT events             ####
-####         required to explain the transfers          ####
-#                                                           #
-## %######################################################%##
+##%######################################################%##
+#                                                          #
+####  This stage counts the number of HTT events that   ####
+####              are required to explain               ####
+####            the TE-TE hits (hit groups)             ####
+#                                                          #
+##%######################################################%##
+
 
 source("HTvFunctions.R")
 
 # this script uses
-# -the table of HTT hits with transfer information generated at step 10
+# -the table of HTT hits with transfer information generated at stage 10
 httHits <- fread("oc200HitGroup.txt")
 
-# - the hit group statistics generated at step 11 (imported later)
-# - the "self-blastn" of TE copies against themselves, generated at step 8
+# - the hit group statistics generated at stage 11 (imported later)
+# - the "self-blastn" of TE copies against themselves, generated at stage 8
 
 # The output is the table of HTT hits with a logical column indicating
 # whether each transfer (hit group) can be "explained" by others (see below)
@@ -188,7 +190,7 @@ highestSimilarity[, lowestSimilarity := minCopyIDs[
 
 # we now select pairs of homologous copies fulfilling our conditions -----------------------------------
 
-# We will also discard the transfers that were considered unreliable in the previous step.
+# We will also discard the transfers that were considered unreliable in the previous stage.
 # Doing it only now allows changing the retained transfers 
 # without having to re-run the whole script
 

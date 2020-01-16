@@ -1,9 +1,9 @@
 ## %######################################################%##
-#                                                          #
-####          finds TE consensuses (families)           ####
-####            that may cover non-TE genes             ####
-# 				to exclude them as aterfactual			   #
-#                                                          #
+#                                                           #
+####      This stage finds TE consensuses (families)     ####
+####            that may cover non-TE genes              ####
+# 				to exclude them as aterfactual		  	    #
+#                                                           #
 ## %######################################################%##
 
 
@@ -44,7 +44,7 @@ consensusFiles <- list.files(
     recursive = T
 )
 
-# we determine the species for each consensus fasta. As for the previous step, species names must be present in file paths
+# we determine the species for each consensus fasta. As for the previous stage, species names must be present in file paths
 species <- extractSpeciesNames(consensusFiles)
 
 # this function  imports a single fasta file

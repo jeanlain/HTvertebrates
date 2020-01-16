@@ -5,15 +5,16 @@
 ####   This stage applies the 2nd round of clustering   ####
 #                                                          #
 ## %######################################################%##
+
 # We cluster hits from different communities into "hit groups" (see the paper methods for details)
 
 source("HTvFunctions.R")
 
 # this script uses
-# - the tabular file of selected TE-TE hit ("HTT hits") from step 7-TEKsAndHTTfilter.R
-httHits <- fread("ocCD00_comm.txt") # HTT hits with community IDs from the previous step
+# - the tabular file of selected TE-TE hit ("HTT hits") from stage 07-TEKsAndHTTfilter.R
+httHits <- fread("ocCD00_comm.txt") # HTT hits with community IDs from the previous stage
 
-# - the self-blastn output generated at step 8
+# - the self-blastn output generated at stage 8
 # - the timetree of the species (both imported later)
 
 # output is
@@ -28,7 +29,7 @@ httHits <- fread("ocCD00_comm.txt") # HTT hits with community IDs from the previ
 # this is done for communities of of hits between TEs of the same super family and MRCA
 # Indeed, two hits involving pairs of species that do not have the
 # same MRCA cannot results from the same HTT (see paper for details)
-# The procedure is similar to what we did in the previous step
+# The procedure is similar to what we did in the previous stage
 
 # here a "group" of hits to cluster is defined by the TE super family and MRCA
 # we therefore add a column indicating the "group" of eac hit
@@ -104,14 +105,14 @@ stats[, crit1 := links / tot > 0.05]
 # 2 clades are involved. One is composed of A-C and the order of species B-D, if
 # A and C belong to one of the 2 subclades diverging from the MRCA. Remember that
 # we took care to place species of one subclade in column sp1 and species of the
-# other subclade in column sp2, for each mrca. (done at step 8-prepareClustering.R)
+# other subclade in column sp2, for each mrca. (done at stage 08-prepareClustering.R)
 
 # for each community, we compute the mean Ks of TE-TE hits
 ksStats <- httHits[, .(meanKs = mean(ks)), by = .(com, mrca)]
 
 # we get the core gene Ks threshold we used for to filter hits between species of a given MRCA
 # we thus import BUSCO gene Ks (200 AA alignments and one score per BUSCO gene per 
-# pair of clades) generated in step 5-coreGeneKs.R
+# pair of clades) generated in stage 05-coreGeneKs.R
 Ks <- fread("gunzip -c Ks200AAnoRedundancy.txt.gz")
 
 # for each pair of subclade diverging from an MRCA ("clade"), we get the Ks threshold mentioned above
@@ -178,7 +179,7 @@ stats[, crit2 := (pmin(Ks1, Ks2) >= pmin(KsAB, KsCD) &
 # their protein regions.
 # the approach is that used in Peccoud et al. 2017 PNAS
 
-# For this we reuse the blastx results of copies against repeat proteins (done in step 6-filterTEhits.R)
+# For this we reuse the blastx results of copies against repeat proteins (done in stage 06-filterTEhits.R)
 blastx <- fread("TEs/blastx/all.copies.successiveBlastx.out")
 
 # we retrieve copy integer IDs, to speed up some functions

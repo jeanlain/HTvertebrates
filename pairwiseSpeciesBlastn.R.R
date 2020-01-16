@@ -7,7 +7,8 @@
 #                                                          #
 ## %######################################################%##
 
-# this script is launched in step 4 and used the table of pairs of species whose TE species are blasted against each other generated in this step
+# this script is launched in stage 04 and used the table of pairs of species 
+# whose TE species are blasted against each other generated in this step
 
 
 library(data.table)

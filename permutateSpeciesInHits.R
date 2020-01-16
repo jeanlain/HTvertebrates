@@ -123,6 +123,8 @@ tooClose <- divTimeMat < 240
 toShuffle <- tipsForNode(tree, node)
 
 
+
+
 # STEP TWO, we permute species for htts (hits) of a batch ----------------------------------------------------------
 shuffleSpecies <- function(hits, superfamily) {
     # we print progress, which is the only use of the superfamily argument
