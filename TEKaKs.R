@@ -17,8 +17,8 @@ args <- commandArgs(trailingOnly = TRUE)
 TEhitFile <- args[1]
 
 # - the path to a tabular file of HPSs between these sequences and proteins.
-# These  HSPs mustn ot overlap on a given TE (see step 7)
-# This file as fields: TE copy name, start and end coordinates of HSP on the TE (start < end),
+# These  HSPs must not overlap on a given TE (see step 7)
+# This file has fields: TE copy name, start and end coordinates of HSP on the TE (start < end),
 # the start coordinate of the HSP on the protein, and a logical telling whether the HSP is
 # in reverse orientation in respect to the TE
 # All values in query and subject columns in the first file but be found in the copy column of this file
