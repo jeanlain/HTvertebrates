@@ -23,7 +23,7 @@ httHits <- fread("oc200HitGroup.txt")
 # similar TEs may have been brought in two vertebrate clades A and B by several transfers ("hit groups")
 # this may give the impression of a direct transfer between those clades
 # hence this focal transfer may be "explained" by others
-# is that is the case, the copies involved in the focal transfer are similar to other transfers
+# if that is the case, the copies involved in the focal transfer are similar to other transfers
 # and  the species involved in the focal transfer are the same as, or related to, 
 # those of the explanatory transfers
 
@@ -61,7 +61,7 @@ hitList <- split(
 # we save this list of tables for the script we run below
 saveRDS(hitList, file = "TEs/clustering/forHighestSimilarity.RDS")
 
-system("Rscript findHighestSimilarity?R 5")
+system("Rscript findHighestSimilarity.R 5")
 
 
 # We import the results
