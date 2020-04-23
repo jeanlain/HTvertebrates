@@ -1,6 +1,6 @@
 # HTvertebrates
 
-Scripts used in "Horizontal transfer and evolution of transposable elements in vertebrates" by Hua-Hao Zhang, Jean Peccoud, Min-Rui-Xuan Xu, Xiao-Gu Zhang, Clément Gilbert (submitted).
+Scripts used in "Horizontal transfer and evolution of transposable elements in vertebrates" by Hua-Hao Zhang, Jean Peccoud, Min-Rui-Xuan Xu, Xiao-Gu Zhang, Clément Gilbert (doi: 10.1038/s41467-020-15149-4).
 
 These scripts are publicly available to indicate how parts of the analysis were automated. There is no guaranty regarding their use. 
 For those who want to use the pipeline, see below:
