@@ -80,6 +80,10 @@ mids <- function(v) {
     (v[i - 1L] + v[i]) / 2L
 }
 
+lastChars <- function(string, n) {
+  # convenience function to extract the last n characters of words
+  stri_sub(string, nchar(string) - n + 1L, length = n)
+}
 
 Split <- function(x, f, drop = FALSE, sep = ".", recursive = F,...) {
   # splits a vector/table recursively by each factor of "f" if f is a list
@@ -2149,7 +2153,7 @@ linesFromTree <- function(tree, angular = T) {
     # the Y coordinates
     Y <- node.height(tree)
 
-    # used as we scan paths to remove branches already covered by previous paths. We start with the root node
+    # we scan paths to remove branches already covered by previous paths. We start with the root node
     temp <- getMRCA(tree, tree$tip.label)
 
     for (i in 1:length(paths)) {
