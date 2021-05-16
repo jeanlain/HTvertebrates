@@ -10,7 +10,7 @@
 
 # this script uses the gzipped fasta of TEs generated at stage 2.
 # as well as the timetree of the species
-# the ouput are the tabular blastn output between the TEs of every relevant pair of species
+# the output are the tabular blastn output between the TEs of every relevant pair of species
 
 source("HTvFunctions.R")
 

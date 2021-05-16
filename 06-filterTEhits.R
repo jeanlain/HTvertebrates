@@ -82,7 +82,7 @@ TEhits[,mean(superF1 == superF2)]
 # copies are identified by different fields,
 copies <- TEhits[, data.table(
     sp = c(sp1, sp2),        # the host species
-    seq = c(query, subject), # the copy name (contig + coordinantes and orientation)
+    seq = c(query, subject), # the copy name (contig + coordinates and orientation)
     fam = c(f1, f2),         # the TE family
     superF = c(superF1, superF2)  # and super family
 )] 
