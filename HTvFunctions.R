@@ -1933,7 +1933,7 @@ ksMode <- function(ks) {
 
 
 fadeTo <- function(source, dest, amount) {
-    # fades source colours into destination colours, by a certain amount (from 0 to 1). 
+    # fades source colors into destination colors, by a certain amount (from 0 to 1). 
     # alpha is not managed and any transparency is removed
    
     dest <- rep(dest, length.out = length(source))
@@ -1946,7 +1946,7 @@ fadeTo <- function(source, dest, amount) {
 
 
 saturate <- function(col, amount) {
-    # saturates colours by a certain amount from -1 (greyscale) to 1 (max saturation)
+    # saturates colors by a certain amount from -1 (greyscale) to 1 (max saturation)
     
     amount <- rep(amount, length.out = length(col))
     amount[amount < -1] <- -1

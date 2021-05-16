@@ -21,7 +21,7 @@
 
 
 # we load the required functions, but this script was non written specifically for the analysis of HTT
-source("HTvFunctions.R")
+source("HTvFunctions.R", chdir = T)
 
 last <- function(x) {
   x[length(x)]

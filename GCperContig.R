@@ -19,7 +19,7 @@ genomes <- list.files(pattern = ".gz", full.names = T, recursive = T)
 genomes <- genomes[order(-file.size(genomes))]
 
 
-# the fonction that counts GC and AT bases
+# the function that counts GC and AT bases
 GCcontent <- function(file) {
   genome <- readDNAStringSet(file)
   

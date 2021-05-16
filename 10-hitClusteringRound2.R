@@ -12,8 +12,8 @@ source("HTvFunctions.R")
 
 # this script uses
 # - the tabular file of selected TE-TE hit ("HTT hits") from stage 07-TEKsAndHTTfilter.R
-httHits <- fread("ocCD00_comm.txt") # HTT hits with community IDs from the previous stage
-
+# with community IDs added at stage 09
+httHits <- fread("ocCD00_comm.txt") 
 # - the self-blastn output generated at stage 8
 # - the timetree of the species (both imported later)
 
@@ -32,11 +32,11 @@ httHits <- fread("ocCD00_comm.txt") # HTT hits with community IDs from the previ
 # The procedure is similar to what we did in the previous stage
 
 # here a "group" of hits to cluster is defined by the TE super family and MRCA
-# we therefore add a column indicating the "group" of eac hit
+# we therefore add a column indicating the "group" of each hit
 
 httHits[, group := stri_c(gsub("/", ".", superF, fixed = T), "_", mrca)]
 
-# like in the previous stage, split the hits by group and select the column we need for the clustering
+# like in the previous stage, we split the hits by group and select the column we need for the clustering
 hitList <- split(
     x = httHits[, .(
         hit = 1:.N,
@@ -58,7 +58,7 @@ nCom <- sapply(
 
 hitList <- hitList[nCom > 1L] 
 
-# and we sort the the hit list by deceasing number of hits (for better CPU usage)
+# and we sort the the hit list by decreasing number of hits (for better CPU usage)
 hitList <- hitList[order(sapply(
     X = hitList,
     FUN = nrow
@@ -69,7 +69,7 @@ decreasing = T
 # results of this round of clustering will go there:
 dir.create("TEs/clustering/round2") 
 
-# we save the list of hits that will be clustered in a dedicated script
+# we save the list of hits that will be clustered by a dedicated script
 saveRDS(
     object = hitList,
     file = "TEs/clustering/round2/hitsFor2ndClustering.RDS"
@@ -81,7 +81,7 @@ system("Rscript iterativeSecondClustering.R 20") # applies criterion 1 with 20 C
 # these are statistics for every relevant pair of hit communities (See iterativeSecondClustering.R)
 stats <- fread("TEs/clustering/round2/all.txt")
 
-# We now evaluate the connexions between hit communities that may represent the same HTTs
+# We now evaluate the connections between hit communities that may represent the same HTTs
 # the number of hit pairs that pass criterion 1 between two communities
 stats[, links := tot - allDiff] 
 
@@ -96,13 +96,13 @@ stats[, crit1 := links / tot > 0.05]
 # STEP TWO, applying "criterion 2" -------------------------------------------------------------------------------------
 ## we evaluate whether 2 communities can represent the same HTT, based on
 # "criterion 2", which relies on the inferred age of the transfer. To reflect the
-# same HTT the transfers (represented by the 2 clusters of hits) should not be
-# more recent that both clades and we infer the maximal times of transfers from
-# the mean Ks between copies at hits of the same community we compare it do the
-# Ks of buscos of corresponding clades so we determine the clades involved. For 2
+# same HTT, the transfers (represented by the 2 communities of hits) should not be
+# more recent that both clades. We infer the maximal times of transfers from
+# the mean Ks between copies at hits of the same community. We compare it do the
+# Ks of buscos of corresponding clades. Se we must determine the clades involved. For 2
 # clusters of hits between young clades A-B (community 1) and C-D (community 2)
 # both coalescing to the same MRCA (mrca of A and B is the same that of C and D),
-# 2 clades are involved. One is composed of A-C and the order of species B-D, if
+# 2 clades are involved. One is composed of A-C and the order of B-D, if
 # A and C belong to one of the 2 subclades diverging from the MRCA. Remember that
 # we took care to place species of one subclade in column sp1 and species of the
 # other subclade in column sp2, for each mrca. (done at stage 08-prepareClustering.R)
@@ -110,12 +110,12 @@ stats[, crit1 := links / tot > 0.05]
 # for each community, we compute the mean Ks of TE-TE hits
 ksStats <- httHits[, .(meanKs = mean(ks)), by = .(com, mrca)]
 
-# we get the core gene Ks threshold we used for to filter hits between species of a given MRCA
+# we get the core gene Ks threshold we used to filter hits between species of a given MRCA
 # we thus import BUSCO gene Ks (200 AA alignments and one score per BUSCO gene per 
 # pair of clades) generated in stage 05-coreGeneKs.R
 Ks <- fread("gunzip -c Ks200AAnoRedundancy.txt.gz")
 
-# for each pair of subclade diverging from an MRCA ("clade"), we get the Ks threshold mentioned above
+# for each pair of subclades diverging from an MRCA ("clade"), we get the Ks threshold mentioned above
 KsThresholds <- Ks[, .(q05 = quantile(Ks, 0.005)), by = clade]
 
 # we add the Ks threshold as a new column
@@ -167,7 +167,7 @@ stats[, c("Ks1", "Ks2") :=
         ksStats[match(com2, com), meanKs]
     )]
 
-# we are now read to apply criterion 2 by adding a logical column to this effect
+# we are now ready to apply criterion 2 by adding a logical column to this effect
 stats[, crit2 := (pmin(Ks1, Ks2) >= pmin(KsAB, KsCD) &
     pmax(Ks1, Ks2) >= pmax(KsAB, KsCD))]
 

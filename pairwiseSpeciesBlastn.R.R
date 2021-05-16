@@ -64,7 +64,7 @@ blastn <- function(fas, db, out) {
             db,
             "-max_target_seqs 1 -outfmt 6 -num_threads",
             nt,
-            # we do not retain HSP with pID < 75 and score < 200 and alignement shorter than 300 pb.
+            # we do not retain HSP with pID < 75 and score < 200 and alignments shorter than 300 pb.
             # Filtering these hits from the beginning was required, else we might have run out of disk space
             "| awk '{if ($3>=75 && $4>=300 && $12>=200) print $0}' >",
             out

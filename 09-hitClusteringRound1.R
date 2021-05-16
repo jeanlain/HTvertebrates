@@ -49,7 +49,7 @@ edges <- data.table(tree$edge)
 # these nodes are the subclades of each mrca in the httHits
 subClades <- edges[V1 %in% mrcas, V2]
 
-# retreives the species of these subclades
+# we retrieve the species of these subclades
 subClades <- tipsForNodes(tree, subClades, names = T)
 
 # and the parent node (mrca) of each subclade
@@ -59,15 +59,15 @@ subClades[, MRCA := edges[match(node, V2), V1]]
 subClades[, comb := stri_c(tip, MRCA, sep = " ")]
 
 # We assign subclade numbers (node numbers of the tree) to species in each hit, 
-httHits[, c("sc1", "sc2") := .(
+httHits[, c("cladeA", "cladeB") := .(
     subClades[chmatch(stri_c(sp1, mrca, sep = " "), comb), node],
     subClades[chmatch(stri_c(sp2, mrca, sep = " "), comb), node]
     )]
 
 # and we ensure that the subclade with lower number is always on the left.
 # This requires swapping many columns of the table:
-httHits[sc1 > sc2, c("query", "subject", "sp1", "sp2", "f1", "f2", "qStart", "qEnd", "sStart", "sEnd", "sc1", "sc2")
-:= .(subject, query, sp2, sp1, f2, f1, sStart, sEnd, qStart, qEnd, sc2, sc1)]
+httHits[cladeA > cladeB, c("query", "subject", "sp1", "sp2", "f1", "f2", "qStart", "qEnd", "sStart", "sEnd", "cladeA", "cladeB")
+:= .(subject, query, sp2, sp1, f2, f1, sStart, sEnd, qStart, qEnd, cladeB, cladeA)]
 
 
 # saved to disk
@@ -100,7 +100,7 @@ queries <- httHits[, unique(q), by = .(superF, mrca)]
 cladeAcopies <- split(queries$V1, queries[, paste(superF, mrca)])
 
 # we will sort groups by decreasing number of copies in queries (for better CPU usage)
-nQueryCopies <- sapply(cladeAcopies, length)
+nQueryCopies <- lengths(cladeAcopies)
 cladeAcopies <- cladeAcopies[order(nQueryCopies, decreasing = T)]
 
 # we do the same for subjects TE copies (from clade B)
@@ -156,7 +156,7 @@ getHits <- function(superF) {
             # the function will be used in parallel, so we don't need more than 1 CPU here
             nThread = 1,
             
-            #we only need these columns for the clustering (we don't use the score, but we imported it just in case)
+            #we only need these columns for the clustering (we don't use the score, but we import it just in case)
             select = c(1:3, 9),
             col.names = c("query","subject","pID","score")
         )
@@ -229,7 +229,7 @@ httHits[, c("C1", "C2") := .(clades[chmatch(sp1, tip), node], clades[chmatch(sp2
 # Hits will be identified by their row indices. We again replace slashes in super family names with periods
 httHits[, c("hit", "group") := .(1:.N, stri_c(stri_replace(superF, ".", fixed = "/"), C1, C2, sep = "_"))]
 
-# We get the column we need fpr the clusering
+# We get the column we need for the clustering
 conv <- httHits[, data.table(hit,
 
     # we convert blast pIDs to integers for efficiency in the clustering
@@ -240,7 +240,7 @@ conv <- httHits[, data.table(hit,
 )]
 
 
-# split these hits according to "groups"
+# we split these hits according to "groups"
 hitList <- split(conv, conv$group)
 hitList <- hitList[order(-sapply(hitList, nrow))]
 
@@ -264,12 +264,12 @@ groupList <- data.table(
 
 
 # we use the number of hits and groups per super family.
-# We'll do the clustering by super families,#so that a
+# We'll do the clustering by super families, so that a
 # filtered self-blastn output (which concerns a super family)
-# need only be imported once for all the groups within the super family
+# needs only be imported once for all the groups within the super family
 perSuperF <- groupList[, .(nHits = sum(nHits), .N), by = superF]
 
-# attributes batches (job numbers) to super families.
+# we attribute batches (job numbers) to super families.
 # several super families with low number of hits are processed in the same job
 perSuperF[, batch := 0L]
 perSuperF[nHits > 30000, batch := 1:.N]

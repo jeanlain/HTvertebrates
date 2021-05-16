@@ -22,13 +22,13 @@ tree <- read.tree("additional_files/timetree.nwk")
 # we get the data ready for the plot-----------------------------
 
 # we create a table of the best hit per transfer, the one we will show on the tree
-# we thus place hits whith highest pID on top
+# we thus place hits with highest pID on top
 setorder(retainedHits, -pID)
 
 # we extract these hits, and the columns we need
 connections <- retainedHits[!duplicated(hitgroup), .(sp1, sp2, superfamily, hitgroup, independent)]
 
-# we will show different colours for the TE class, we determine them based on superfamily name
+# we will show different colors for the TE class, we determine them based on superfamily name
 connections[, class := ifelse(
     test = grepl("CMC|hAT|Mariner|Maverick|Merlin|PIF|PiggyBac", superfamily),
     yes = "DNA",
@@ -132,7 +132,7 @@ circSegments(
     lend = 1, lwd = 0.5
 )
 
-# we drow the ages themselves
+# we draw the ages themselves
 circText(
     x = rep(-0.8, length(ages)),
     y = tipPos + ages,
@@ -142,7 +142,7 @@ circText(
 )
 
 
-# we draw the concave tree itself -------------------------------------------------
+# we draw the concave tree -------------------------------------------------
 l <- lapply(
     X = brancheLines,
     FUN = function(v) {
@@ -155,9 +155,9 @@ l <- lapply(
 )
 
 
-# we add coloured points at the node of outlined clades ------------------------
+# we add colored points at the node of outlined clades ------------------------
 taxa[
-    onTree == T & age > 1, # age > 1 to avoid drowing points for single-tip taxa
+    onTree == T & age > 1, # age > 1 to avoid drawing points for single-tip taxa
     circPoints(
         x = xTipPos[node],
         y = tipPos + age,
@@ -169,7 +169,7 @@ taxa[
 ]
 
 
-# we add curved grey segments above tipes of clades younger than 120 My ---------
+# we add curved grey segments above tips of clades younger than 120 My ---------
 outlinedClades[, circSegments(
     x0 = min(xTipPos[tip]) - 0.2,
     y0 = tipPos - 20,

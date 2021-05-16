@@ -1,9 +1,9 @@
 ## %######################################################%##
 #                                                          #
-####          This scripts shuffle sspecies to          ####
+####          This script shuffles species to           ####
 ####       generate random species pairs involved       ####
 ####            in transfers, for each super            ####
-####       family, avoiding to generate "illegal        ####
+####       family, avoiding generating "illegal         ####
 ####   pairs" for which no HTT can be infered, due to   ####
 ####         our requirement that species must          ####
 ####             be divergent by 2*120 My.              ####
@@ -16,10 +16,10 @@ source("HTvFunctions.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# number of CPUs to use
+# the first argument is the number of CPUs to use
 nCPUs <- as.integer(args[1])
 
-# an second optional argument is a node number to permute only species within this clade. 
+# a second optional argument is a node number to permute only species within this clade. 
 # Defaults to the basal node to permute all species
 tree <- read.tree("additional_files/timetree.nwk")
 node <- ifelse(is.na(args[2]), which.max(node.depth(tree)), as.integer(args[2]))
@@ -45,7 +45,7 @@ retainedHits <- fread("supplementary-data4-retained_hits.txt")
 # we put the best hits on top 
 setorder(retainedHits, -pID)
 
-# so we extract the one we one (note that we only consider "independent" transfers)
+# we extract the ones we want (note that we only consider "independent" transfers)
 # and we replace species names with tip numbers at the same time
 HTThits <- retainedHits[independent == T, .(
     sp1 = chmatch(sp1[1], tree$tip.label),
@@ -57,11 +57,12 @@ HTThits <- retainedHits[independent == T, .(
 
 # we determine the scope of permutations. Ideally, we permute species involved in htt within a TE super family, 
 # but some contain too few HTT for this to be meaningful, 
-# and others contain too many, which makes impossible to obtain only "legal permutations"
+# and others contain too many, which makes impossible to obtain only "legal" permutations
 # to make our choices, we compute the number of independent transfers per super family, 
 nTr <- HTThits[, .N, by = superfamily]
 
-# we add a column to denote the TE class we pool super families (within TE classes) that are involved in less than 20 transfers
+# we add a column to denote the TE class, as we pool super families 
+# that are involved in less than 20 transfers within classes
 nTr[, class := ifelse(grepl("CMC|hAT|Mariner|Maverick|Merlin|PIF|PiggyBac", superfamily),
     "DNA",
     "RNA"
@@ -79,7 +80,7 @@ nTr <- nTr[, .(N = sum(N)), by = combined]
 
 # as there may be too many hits per superfamily to obtain only "legal" permutations, 
 # we will split certain super families in batches of hits (when they encompass more than 120 transfers)
-# we add a column for the number of time a superfamily has been seen in a transfer
+# We add a column for the number of time a superfamily has been seen in transfers
 HTThits[, occ := occurrences(superfamily)]
 
 # we compute the max number of transfers we allow per superfamily batch
@@ -131,7 +132,7 @@ shuffleSpecies <- function(hits, superfamily) {
     print(superfamily)
     
     # to speeds things up, we generate 10^5 permutations in a row as the vast
-    # majority lead to invalid transfers. This allows taking advantage of
+    # majority lead to illegal transfers. This allows taking advantage of
     # vectorised functions after that.
     # for that, we need the number of hits
     nHits <- nrow(hits)

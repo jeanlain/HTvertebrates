@@ -130,7 +130,7 @@ hitCommunities <- function(group) {
             ))
         )
 
-        # we retreive the ids of copies involved in the 2 hits (2 per clade)
+        # we retrieve the ids of copies involved in the 2 hits (2 per clade)
         pairs[, c("q1", "s1", "q2", "s2") := data.table(
             hits[hit1, .(qid, sid)],
             hits[hit2, .(qid, sid)]

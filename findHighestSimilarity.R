@@ -109,10 +109,10 @@ findSimilarities <- function(superF) { # superF is the superfamily name (charact
     copyPerHitGroup <- split(copyPerHitGroup$copy, copyPerHitGroup$hitGroup)
 
     # we count the number of subjects per query, used later
-    nSubjects <- sapply(subjectsForQuery, length)
+    nSubjects <- lengths(subjectsForQuery)
 
     # as well as the number of hit groups where each copy is found
-    nHitGroups <- sapply(hitGroupsForCopy, length)
+    nHitGroups <- lengths(hitGroupsForCopy)
 
     rm(selfBlast) # to reclaim RAM, as there are lots of hits
 

@@ -48,9 +48,9 @@ names(blastFiles) <- gsub(
 
 
 
-# STEP TWO, we "confront" every two communities of hits, we will work per super family------------------------------------------------------------
+# STEP TWO, we "confront" every two communities of hits, we do this per super family------------------------------------------------------------
 communityPairStats <- function(superFam) {
-    # we identify the self-blatn outputs we need, and import them
+    # we identify the self-blastn outputs we need, and import them
     blastFile <- blastFiles[superFam]
     blast <- fread(
         input = blastFile,
@@ -75,8 +75,8 @@ communityPairStats <- function(superFam) {
         # we retrieve the hits of the group
         hits <- copy(group)
 
-        # we sort these hits per community will ensures that the
-        # communities pairs are formed in the same "direction"
+        # we sort these hits per community to ensure that the
+        # community pairs are formed in the same "direction"
         # (com1 vs com2 and never the opposite)
         setorder(hits, com)
 
@@ -126,13 +126,13 @@ communityPairStats <- function(superFam) {
                     hits[hit2, .(query, subject, com, pID)]
                 )]
 
-            # we create query-subject pair idenfiers as we did for the self-blastn output
+            # we create query-subject pair identifiers as we did for the self-blastn output
             # we must ensure that the left copy id is always lower than right one
             # (as it is the case for the copyPair identifiers in the self-blast files)
             pairs[q1 > q2, c("q1", "q2") := .(q2, q1)] # we swap these ids if it is not the case
             pairs[s1 > s2, c("s1", "s2") := .(s2, s1)]
 
-            # creates the same pair identifiers we created for the blast results
+            # we create the same pair identifiers we created for the blast results
             pairs[, c("qPair", "sPair") := .(
                 10^6 * q1 + q2,
                 10^6 * s1 + s2
@@ -140,7 +140,7 @@ communityPairStats <- function(superFam) {
 
             # so we can retrieve within-clade sequence identities.
             # The nomatch argument below makes it so that the pID of the last row
-            # in selectedHits (which has pID 0) is return where there is no match (no hit).
+            # in selectedHits (which has pID 0) is returned where there is no match (no hit).
             # This speeds things up a little
             pairs[, c("intra1", "intra2") := .(
                 selectedHits[match(qPair, copyPair, nomatch = .N), pID],
@@ -161,16 +161,16 @@ communityPairStats <- function(superFam) {
 
             # we return statistics for each community pair
             # (note that a community pair may involve the same community twice,
-            # which can helps to assess how much hits within a community are connected)
+            # which can help to assess the degree to which hits within a community are connected)
 
             pairs[, .(
                 allDiff = sum(!connected), # number of pairs of hits not passing the criterion
                 diff = sum(maxIntra > 0L & !connected), # the same, but for hits whose copies have some degree of intra-clade identity
                 valid = sum(maxIntra > 0L), # the number of pairs of hits whose copies have some degree of intra-clade identity,
-                tot = .N
-            ), # the total number of pairs of hits evaluated
-            by = .(com1, com2)
-            ] # all this is done for each community pair
+                tot = .N # the total number of pairs of hits evaluated
+            ), 
+            by = .(com1, com2) # all this is done for each community pair
+            ] 
         }
 
         # we apply the function in parallel for the different batches

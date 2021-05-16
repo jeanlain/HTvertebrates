@@ -21,7 +21,7 @@ TEhitFile <- args[1]
 # This file has fields: TE copy name, start and end coordinates of HSP on the TE (start < end),
 # the start coordinate of the HSP on the protein, and a logical telling whether the HSP is
 # in reverse orientation in respect to the TE
-# All values in query and subject columns in the first file but be found in the copy column of this file
+# All values in query and subject columns in the first file must be found in the copy column of this file
 blastxFile <- args[2]
 
 # - the path to the fasta file containing the TE sequences. 
@@ -59,13 +59,13 @@ hits <- TEhits[, which(
   query %chin% covPerCopy[V1 > 30L, copy] & subject %chin% covPerCopy[V1 > 30L, copy]
   )]
 
-# we split the work into several batches (jobs) for parallelisation
+# we split the work into several batches (jobs) for parallelism
 # The size of a batch of HSPs (4000) must not be too big due to memory constrains.
 nJobs <- max(nCPUs, ceiling(length(hits) / 4000))
 
 # we split the HSPs into the batches
 hits <- splitEqual(sample(hits), n = nJobs)
-# Note that we randomise HPSs (rows) to reduce differences in job durations 
+# Note that we randomize HPSs (rows) to reduce differences in job duration 
 
 # we import the TE sequences
 seqs <- readDNAStringSet(fastaFile) 
@@ -82,7 +82,7 @@ sSeqs <- TEhits[, subSeq(seqs[subject], sStart, sEnd)]
 qSeqs <- lapply(hits, function(batch) qSeqs[batch])
 sSeqs <- lapply(hits, function(batch) sSeqs[batch])
 
-# and we do the same for the hits themselve (we only retain coordinates of hits)
+# and we do the same for the hits themselves (we only retain coordinates of hits)
 TEhits <- lapply(hits, function(batch) {
       TEhits[batch, .(query, subject, qStart, qEnd, sStart, sEnd)]
   })
@@ -103,7 +103,7 @@ KaKsForJob <- function(job) { # the only argument is the job number
         seq2 = sSeqs[[job]]
     )
     
-    # we retreive the table of coordinates of hits corresponding to this job
+    # we retrieve the table of coordinates of hits corresponding to this job
     TEhitBatch <- TEhits[[job]]
 
     # we determine position of bases within codons --------------------------------
@@ -153,7 +153,7 @@ KaKsForJob <- function(job) { # the only argument is the job number
     nuc <- nuc[!is.na(hsp1) & !is.na(hsp2)]
 
     # we now determine the position in codon ="frame" (1 to 3 or -1 to -3) of each position
-    # for this, we need to know the the orientation of the protein in respect to the copy
+    # for this, we need to know the the strand of the protein with respect to the copy
     # we thus add two logical column that tell whether the blastx HSPs are in reversed (for query and subject)
     nuc[, c("rev1", "rev2") := .(
         blastx[hsp1, rev],
@@ -204,7 +204,7 @@ KaKsForJob <- function(job) { # the only argument is the job number
         diff(aln) != 0
     )] 
 
-    # each aligned position gets ab identifier that differs between codons
+    # each aligned position gets an identifier that differs between codons
     codon <- cumsum(shift)
 
     # we retain only complete codons (found 3 times)

@@ -10,7 +10,7 @@
 
 # In this stage, we estimate the sequence identify between all TE copies within
 # all super families with blastn all vs all (referred to as "self blast"
-# afterwards). This will be used to determine of two hits represent the same HTT
+# afterwards). This will be used to determine if two hits represent the same HTT
 # (identity at the hits is lower than identity between copies in each clade,
 # referred to as "criterion 1" in the paper), and also for the analysis of TE
 # evolution within genomes
@@ -35,7 +35,7 @@ httHits <- fread("occ2000ds05.txt")
 # per single-linkage cluster, as hits from the same cluster are very likely
 # to represent the same HTT
 
-# we favour hits that involve the longest protein coding regions
+# we favor hits that involve the longest protein coding regions
 setorder(httHits, -length.aa)
 httHits <- httHits[occ <= 200L, ]
 
@@ -57,7 +57,7 @@ write(copies, "temp.bed")
 # and we extract these sequences into a new fasta file
 seqtk(
     fas = "TEKs/selectedCopiesAA300cl2000.fas",
-    bed = "temp",
+    bed = "temp.bed",
     out = "TEs/clustering/selectedCopiesKs05occ200.fas"
 )
 file.remove("temp.bed")
@@ -71,7 +71,7 @@ copies <- names(seqs)
 # we extract super family names and replaces slashes with periods as file names will contains super family names
 superF <- gsub("/", ".", stri_extract_last(copies, regex = "[^#]+"), fixed = T)
 
-# attributes integer number to copies, which we will used instead of long copy names
+# we attribute integer numbers to copies, which we will used instead of long copy names
 copyID <- data.table(copy = copies, id = 1:length(copies))
 
 # we write this correspondence to disk as it will be reused many times afterwards
@@ -101,7 +101,7 @@ m <- lapply(fasNames, function(x) {
 # where split query fastas will go
 dir.create("TEs/clustering/blastn/split")
 
-# temporary blatn output files with go there
+# temporary blastn output files with go there
 dir.create("TEs/clustering/blastn/out")
 
 # and the output file will go there
@@ -109,7 +109,7 @@ dir.create("TEs/clustering/blastn/done")
 
 
 # the number of sequences per super family, which we used to decide how much we split the queries
-nD <- as.numeric(sapply(all.db, length))
+nD <- as.numeric(lengths(all.db))
 
 # the criterion is the size of query * size of db
 nComp <- data.table(
@@ -158,7 +158,7 @@ searches <- data.table(query = names(splitSequences), db = stri_c(dbs, ".fas"))
 searches[, out := gsub("split", "out", query)]
 searches[, out := gsub(".fas", ".out", out)]
 
-# we attribute batches of blastn searches to be launch from a given R instance, on a node (using sarray would probably have been better)
+# we attribute batches of blastn searches to be launched from a given R instance, on a node (using sarray would have been better)
 searches[, batch := rep(1:(.N / 30), length.out = .N)]
 writeT(searches, "copiesToSelfBlast.txt")
 

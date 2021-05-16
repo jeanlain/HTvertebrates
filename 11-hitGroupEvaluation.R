@@ -166,21 +166,21 @@ copiesInHitGroups <- copiesInHitGroups[!duplicated(data.table(hitGroup, copy))]
 # as we will need to know the clade they belong to
 # since our contamination filter imposes a certain number of copies per clade per hit group)
 
-# for this we generate a table that makes the correspondance between copy and species
+# for this we generate a table that makes the correspondence between copy and species
 spForCopy <- blast[, unique(c(httCopy, speciesCopy)), by = sp]
 
 
 copiesInHitGroups[, sp := spForCopy[chmatch(copy, V1), sp]]
 
 # to determine the clade to which the copy belongs, we make a
-# list of species of the "left" clade (sc1) in each hit group
+# list of species of the "left" clade (clade A) in each hit group
 sp1perHitGroup <- httHits[, unique(sp1), by = hitGroup]
 sp1perHitGroup <- split(sp1perHitGroup$V1, sp1perHitGroup$hitGroup)
 
 setorder(copiesInHitGroups, hitGroup)
 
 # we add a logical column that is TRUE for copies belonging to the "left" clade of a hit group
-# and obviously, it is FALSE for copies belonging to the "right" clade "sc2"
+# and obviously, it is FALSE for copies belonging to the "right" clade "clade B"
 copiesInHitGroups$inClade1 <- copiesInHitGroups[, sp %chin% sp1perHitGroup[[hitGroup]], by = hitGroup]$V1
 
 

@@ -152,7 +152,7 @@ system("Rscript TEKaKs.R allOCC2000.txt TEKs/blastxOCC2000EXcov1.out TEKs/select
 
 # STEP THREE, we remove hits that may result from VT based on Ks --------------------------------------------
 
-# we gather results and merging them with the table of selected hits
+# we gather results and merge them with the table of selected hits
 TEKs <- fread("TEKs/allKaKs.txt")
 
 # we add an integer identifier to the hits, as it was used in TEKaKs.R 
@@ -187,7 +187,7 @@ qKs <- KsQuantile[match(selectedHits$mrca, clade), q05]
 httHits <- selectedHits[ks + 2 * vks < qKs & length.aa >= 100L & ks < 0.5, ]
 
 # (The removal of all hits between species that diverged in the last 120 My was done quite late in the pipeline.
-# it was not considered as needed at this stage. Doing it here would save some computationnal time, but won't change the results)
+# it was not considered as needed at this stage. Doing it here would save some computational time, but won't change the results)
 
 
 writeT(httHits, "occ200Ks05.txt")

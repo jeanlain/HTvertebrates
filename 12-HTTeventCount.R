@@ -94,7 +94,7 @@ highestSimilarity <- fread(
 # defining the clades requires the species tree
 tree <- read.tree("additional_files/timetree.nwk")
 
-# We first retreive the host species of each copy of the focal transfer,
+# We first retrieve the host species of each copy of the focal transfer,
 # we encode species as tip numbers of the timetree
 spForCopy <- integer(httHits[,max(q, s)])
 spForCopy[httHits[,c(q, s)]] <- httHits[,chmatch(c(sp1, sp2), tree$tip.label)]
@@ -135,7 +135,7 @@ cladeForCopies[, copyTransfer := copy * 10000 + hitGroup]
 # we do the same for the highestSimilarity table
 highestSimilarity[, copyfocalTransfer := copy * 10000 + focalTransfer]
 
-# We now add a colum denoting the clade to which the copy belongs in the focalTransfer
+# We now add a column denoting the clade to which the copy belongs in the focalTransfer
 # We call this column "clade_A" to match the name we use in the pseudocode
 highestSimilarity[,clade_A := cladeForCopies[match(
   copyfocalTransfer,
@@ -218,9 +218,9 @@ selectedCopies <- highestSimilarity[,
 # in all the species composing the focalTransfer
 
 
-# We make several objects (lists) to optimise the procedure.
+# We make several objects (lists) to optimize the procedure.
 # We first list the species that carry copies that are
-# similar to those of other transfers harbouring related species
+# similar to those of other transfers harboring related species
 
 # at this stage, we no longer care about TE copies, 
 # so we simplify the table with unique()
@@ -263,7 +263,7 @@ spForTransfer <- reList(split(
 ))
 
 
-# These lists were generated to optimise the speed of the function below
+# These lists were generated to optimize the speed of the function below
 # This is the function that tells if a focal transfer can be explained by others
 # i.e., if "requirement 1" as defined in the methods and pseudocode is passed
 
@@ -280,7 +280,7 @@ requirement1_passed <- function(transfer) {
     # the function was more complex to understand and distant from the 
     # pseudocode
     
-    # we return wether these species constitue all species of the focal transfer
+    # we return whether these species constitute all species of the focal transfer
     # and if there are at least 2 contributing transfers
     all(spForTransfer[[as.integer(transfer)]] %in% 
           unlist(explSpecies, use.names = F)) & 
@@ -341,7 +341,7 @@ for (focalTransfer in orderedTransfers) {
           names(explainedSpecies[[focalTransfer]])
           )
         
-        # we check if all these transfers to can 
+        # we check if all these transfers can 
         # still be explained without the focal transfer
         stillExplained <- sapply(toInvestigate, requirement1_passed)
         
